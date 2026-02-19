@@ -46,6 +46,11 @@
     body.dark-theme .time {
         color: #ff9faf;
     }
+    body.dark-theme .user-counter {
+        background: #2d2d2d;
+        color: #ff9faf;
+        border: 1px solid #ff9faf;
+    }
     
     .container { 
         width: 100%; 
@@ -148,11 +153,42 @@
     body.dark-theme .theme-toggle:hover {
         background: #ff7f9f;
     }
+    
+    /* Счетчик пользователей */
+    .user-counter {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        background: white;
+        padding: 12px 24px;
+        border-radius: 50px;
+        box-shadow: 0 4px 15px rgba(255, 159, 175, 0.3);
+        border: 1px solid #ff9faf;
+        font-family: 'Segoe UI', 'Inter', sans-serif;
+        font-weight: 600;
+        color: #ff7f9f;
+        font-size: 16px;
+        z-index: 1000;
+        backdrop-filter: blur(5px);
+        transition: transform 0.3s ease;
+    }
+    .user-counter:hover {
+        transform: scale(1.05);
+    }
+    .user-counter i {
+        margin-right: 8px;
+        font-size: 18px;
+    }
     </style>
 </head>
 <body>
 
 <button class="theme-toggle" id="themeToggle" onclick="toggleTheme()">🌙</button>
+
+<!-- Счетчик пользователей -->
+<div class="user-counter" id="userCounter">
+    <span>👥 Пользователи: <span id="userCount">0</span></span>
+</div>
 
 <div class="container">
     <h3>Панель управления</h3>
@@ -183,6 +219,19 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
+// Функция для обновления счетчика пользователей
+const updateUserCounter = async () => {
+    try {
+        const snapshot = await getFirestore().collection("requests").get();
+        const userCount = snapshot.size;
+        document.getElementById('userCount').textContent = userCount;
+    } catch (e) {
+        console.error("Ошибка при подсчете пользователей:", e);
+    }
+};
+
+// Вызываем при загрузке
+updateUserCounter();
 
 window.processLike = async (id) => {
     const docRef = doc(db, "requests", id);
@@ -196,6 +245,7 @@ window.processLike = async (id) => {
 window.deletePost = async (id) => {
     try {
         await deleteDoc(doc(db, "requests", id));
+        updateUserCounter(); // Обновляем счетчик после удаления
     } catch (e) {
         console.error("Ошибка удаления:", e.message);
     }
@@ -227,6 +277,7 @@ document.getElementById('mainBtn').onclick = async () => {
             timestamp: serverTimestamp()
         });
         document.getElementById('email').value = "";
+        updateUserCounter(); // Обновляем счетчик после добавления
     } catch (e) {
         alert("Ошибка безопасности: Данные отклонены сервером.");
     }
@@ -237,6 +288,10 @@ const q = query(collection(db, "requests"), orderBy("timestamp", "desc"));
 onSnapshot(q, (snapshot) => {
     const feed = document.getElementById('feed');
     feed.innerHTML = "";
+    
+    // Обновляем счетчик при любом изменении в коллекции
+    document.getElementById('userCount').textContent = snapshot.size;
+    
     snapshot.forEach((doc) => {
         const data = doc.data();
         feed.innerHTML += `
@@ -246,6 +301,9 @@ onSnapshot(q, (snapshot) => {
             <p style="margin: 5px 0;">${data.email}</p>
             <button class="like-btn" onclick="processLike('${doc.id}')">
                 👍 ${data.likes || 0}
+            </button>
+            <button class="like-btn" onclick="deletePost('${doc.id}')" style="background: #ff7f9f;">
+                🗑️
             </button>
         </div>
         `;
