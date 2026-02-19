@@ -187,7 +187,7 @@
 
 <!-- Счетчик пользователей -->
 <div class="user-counter" id="userCounter">
-    <span>👥 Пользователи: <span id="userCount">0</span></span>
+    <span>Пользователи: <span id="userCount">0</span></span>
 </div>
 
 <div class="container">
@@ -203,7 +203,7 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js";
 import {
     getFirestore, collection, addDoc, query, orderBy, onSnapshot,
-    serverTimestamp, updateDoc, doc, increment, deleteDoc
+    serverTimestamp, updateDoc, doc, increment
 } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
 
 const firebaseConfig = {
@@ -219,50 +219,12 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
-// Функция для обновления счетчика пользователей
-const updateUserCounter = async () => {
-    try {
-        const snapshot = await getFirestore().collection("requests").get();
-        const userCount = snapshot.size;
-        document.getElementById('userCount').textContent = userCount;
-    } catch (e) {
-        console.error("Ошибка при подсчете пользователей:", e);
-    }
-};
-
-// Вызываем при загрузке
-updateUserCounter();
-
 window.processLike = async (id) => {
     const docRef = doc(db, "requests", id);
     try {
         await updateDoc(docRef, { likes: increment(1) });
     } catch (e) {
         console.error("Ошибка лайка:", e.message);
-    }
-}
-
-window.deletePost = async (id) => {
-    try {
-        await deleteDoc(doc(db, "requests", id));
-        updateUserCounter(); // Обновляем счетчик после удаления
-    } catch (e) {
-        console.error("Ошибка удаления:", e.message);
-    }
-}
-
-// Редактирование email
-window.editEmail = async (id) => {
-    const newEmail = prompt("Введите новый email:");
-
-    if (!newEmail) return;
-
-    try {
-        await updateDoc(doc(db, "requests", id), {
-            email: newEmail
-        });
-    } catch (e) {
-        alert("Ошибка: данные не прошли проверку безопасности");
     }
 }
 
@@ -277,7 +239,6 @@ document.getElementById('mainBtn').onclick = async () => {
             timestamp: serverTimestamp()
         });
         document.getElementById('email').value = "";
-        updateUserCounter(); // Обновляем счетчик после добавления
     } catch (e) {
         alert("Ошибка безопасности: Данные отклонены сервером.");
     }
@@ -301,9 +262,6 @@ onSnapshot(q, (snapshot) => {
             <p style="margin: 5px 0;">${data.email}</p>
             <button class="like-btn" onclick="processLike('${doc.id}')">
                 👍 ${data.likes || 0}
-            </button>
-            <button class="like-btn" onclick="deletePost('${doc.id}')" style="background: #ff7f9f;">
-                🗑️
             </button>
         </div>
         `;
