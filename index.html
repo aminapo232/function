@@ -27,7 +27,7 @@
     .image-preview { width: 100%; max-height: 200px; object-fit: contain; border-radius: 8px; border: 1px solid #ddd; }
     .remove-image-btn { background: #dc3545; padding: 8px; font-size: 14px; width: 100%; margin-top: 10px; }
     .loading { display: none; color: #28a745; margin: 10px 0; font-weight: bold; text-align: center; }
-    .error-message { color: #dc3545; margin: 10px 0; font-size: 14px; display: none; }
+    .error-message { color: #dc3545; margin: 10px 0; font-size: 14px; display: none; text-align: center; }
 
     .post { background: #fff; border: 1px solid #eaeaea; padding: 15px; margin-top: 15px; border-radius: 8px; width: 100%; max-width: 500px; box-sizing: border-box; }
     .post-header { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
@@ -57,17 +57,17 @@
     
     <!-- Блок загрузки изображения -->
     <div class="image-upload-container">
-        <button id="uploadImageBtn" class="upload-btn" type="button">Выбрать изображение</button>
+        <button id="uploadImageBtn" class="upload-btn" type="button">📷 Выбрать изображение</button>
         <input type="file" id="imageInput" accept="image/jpeg,image/png,image/gif,image/webp" style="display: none;">
         <div class="image-preview-container" id="imagePreviewContainer">
             <img id="imagePreview" class="image-preview" alt="Превью">
-            <button id="removeImageBtn" class="remove-image-btn" type="button">Удалить изображение</button>
+            <button id="removeImageBtn" class="remove-image-btn" type="button">❌ Удалить изображение</button>
         </div>
     </div>
     
-    <div id="uploadProgress" class="loading">Загрузка изображения...</div>
+    <div id="uploadProgress" class="loading">⏳ Загрузка: 0%</div>
     <div id="errorMessage" class="error-message"></div>
-    <button id="mainBtn">Опубликовать запись</button>
+    <button id="mainBtn">📤 Опубликовать запись</button>
 </div>
 
 <div id="feed" style="width: 100%; max-width: 500px;"></div>
@@ -83,7 +83,7 @@
         apiKey: "AIzaSyDZOKzs007RdB0tIMq1sYGWzKJGjiPsxgo",
         authDomain: "marketingagency-c5d62.firebaseapp.com",
         projectId: "marketingagency-c5d62",
-        storageBucket: "marketingagency-c5d62.firebasestorage.app",
+        storageBucket: "marketingagency-c5d62.appspot.com", // Исправлено: убран .firebasestorage.app
         messagingSenderId: "1090414010954",
         appId: "1:1090414010954:web:2f30eb82901368b3d2fcb3"
     };
@@ -94,6 +94,9 @@
     const auth = getAuth(app);
     const storage = getStorage(app);
     const provider = new GoogleAuthProvider();
+
+    // Проверка инициализации Storage
+    console.log("Storage initialized:", storage);
 
     // Дополнительные настройки для провайдера
     provider.setCustomParameters({
@@ -188,6 +191,8 @@
                 imagePreviewContainer.style.display = 'block';
             };
             reader.readAsDataURL(file);
+            
+            console.log("Файл выбран:", file.name);
         }
     };
 
@@ -196,7 +201,9 @@
         imageInput.value = '';
         imagePreviewContainer.style.display = 'none';
         imagePreview.src = '';
+        uploadProgress.textContent = "⏳ Загрузка: 0%";
         hideError();
+        console.log("Изображение удалено");
     };
 
     // --- Вспомогательные функции ---
@@ -226,6 +233,7 @@
             await updateDoc(doc(db, "requests", id), { 
                 likes: increment(1) 
             });
+            console.log("Лайк добавлен");
         } catch (e) {
             console.error("Ошибка при добавлении лайка:", e);
             showError("Ошибка при добавлении лайка");
@@ -253,6 +261,8 @@
             
             // Загружаем изображение, если оно выбрано
             if (selectedImageFile) {
+                console.log("Начинаем загрузку изображения:", selectedImageFile.name);
+                
                 // Создаем уникальное имя файла
                 const fileName = `${Date.now()}_${selectedImageFile.name.replace(/[^a-zA-Z0-9.]/g, '_')}`;
                 const storageRef = ref(storage, `images/${fileName}`);
@@ -260,18 +270,23 @@
                 // Загружаем с отслеживанием прогресса
                 const uploadTask = uploadBytesResumable(storageRef, selectedImageFile);
                 
+                // Ждем завершения загрузки
                 await new Promise((resolve, reject) => {
                     uploadTask.on(
                         'state_changed',
                         (snapshot) => {
                             const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-                            uploadProgress.textContent = `Загрузка: ${Math.round(progress)}%`;
+                            uploadProgress.textContent = `⏳ Загрузка: ${Math.round(progress)}%`;
+                            console.log(`Прогресс: ${Math.round(progress)}%`);
                         },
                         (error) => {
+                            console.error("Ошибка загрузки:", error);
                             reject(error);
                         },
                         async () => {
+                            // Загрузка завершена, получаем URL
                             imageUrl = await getDownloadURL(uploadTask.snapshot.ref);
+                            console.log("Изображение загружено, URL:", imageUrl);
                             resolve();
                         }
                     );
@@ -293,12 +308,15 @@
                 postData.imageUrl = imageUrl;
             }
 
-            await addDoc(collection(db, "requests"), postData);
+            console.log("Сохраняем в Firestore:", postData);
+            
+            const docRef = await addDoc(collection(db, "requests"), postData);
+            console.log("Запись создана, ID:", docRef.id);
             
             // Очищаем форму
             contentInput.value = "";
             removeImageBtn.click(); // Очищаем выбранное изображение
-            uploadProgress.textContent = "Загрузка изображения...";
+            uploadProgress.textContent = "⏳ Загрузка: 0%";
             
         } catch (e) {
             console.error("Ошибка:", e);
@@ -308,6 +326,8 @@
                 showError("Ошибка доступа! Проверьте правила Firebase Storage и Firestore.");
             } else if (e.code === 'storage/unauthorized') {
                 showError("Нет прав для загрузки изображений!");
+            } else if (e.code === 'storage/unknown') {
+                showError("Ошибка загрузки. Проверьте подключение к интернету.");
             } else {
                 showError("Ошибка при публикации: " + e.message);
             }
@@ -367,6 +387,8 @@
     window.db = db;
     window.auth = auth;
     window.storage = storage;
+    
+    console.log("Приложение загружено");
 </script>
 </body>
 </html>
