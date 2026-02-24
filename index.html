@@ -2,300 +2,280 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <title>Облако BaAsS</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Облачное приложение</title>
     <style>
-    * {
-        transition: background-color 0.3s ease, color 0.2s ease, border-color 0.3s ease;
-    }
-    body { 
-        font-family: 'Segoe UI', 'Inter', 'Helvetica Neue', sans-serif; 
-        background: #fff0f3; 
-        display: flex; 
-        flex-direction: column; 
-        align-items: center; 
-        padding: 20px; 
-        margin: 0;
-        min-height: 100vh;
-        position: relative;
-    }
-    
-    /* Темная тема */
-    body.dark-theme { 
-        background: #1a1a1a; 
-    }
-    body.dark-theme .container {
-        background: #2d2d2d;
-        box-shadow: 0 4px 15px rgba(0,0,0,0.3);
-    }
-    body.dark-theme input {
-        background: #3d3d3d;
-        border-color: #ff9faf;
-        color: #fff;
-    }
-    body.dark-theme input::placeholder {
-        color: #999;
-    }
-    body.dark-theme .post {
-        background: #2d2d2d;
-        border-color: #ff9faf;
-        color: #fff;
-    }
-    body.dark-theme h3 {
-        color: #ff9faf;
-    }
-    body.dark-theme .time {
-        color: #ff9faf;
-    }
-    body.dark-theme .user-counter {
-        background: #2d2d2d;
-        color: #ff9faf;
-        border: 1px solid #ff9faf;
-    }
-    
-    .container { 
-        width: 100%; 
-        max-width: 500px; 
-        background: white; 
-        padding: 12px; 
-        border-radius: 12px; 
-        box-shadow: 0 4px 15px rgba(0,0,0,0.05); 
-        position: relative;
-    }
-    input { 
-        width: 100%; 
-        padding: 12px; 
-        margin: 3px 0; 
-        border: 1px solid #ffb6c1; 
-        border-radius: 6px; 
-        box-sizing: border-box; 
-        font-family: 'Segoe UI', 'Inter', sans-serif;
-    }
-    button#mainBtn { 
-        background: #ff9faf; 
-        color: white; 
-        border: none; 
-        padding: 12px; 
-        border-radius: 6px; 
-        width: 100%; 
-        font-weight: 600; 
-        cursor: pointer; 
-        transition: 0.3s ease-in-out; 
-        font-family: 'Segoe UI', 'Inter', sans-serif;
-    }
-    button#mainBtn:hover {
-        background: #ff7f9f;
-    }
-    .post { 
-        background: #fff; 
-        border: 1px solid #ffb6c1; 
-        padding: 15px; 
-        margin-top: 15px; 
-        border-radius: 8px; 
-        width: 100%; 
-        max-width: 500px; 
-        position: relative; 
-        font-family: 'Segoe UI', 'Inter', sans-serif;
-    }
-    .like-btn { 
-        cursor: pointer; 
-        border: none; 
-        background: #ff9faf; 
-        color: white;
-        padding: 5px 12px; 
-        border-radius: 20px; 
-        font-size: 14px; 
-        transition: 0.2s; 
-        margin-right: 5px;
-        font-family: 'Segoe UI', 'Inter', sans-serif;
-    }
-    .like-btn:hover { 
-        background: #ff7f9f; 
-    }
-    .time { 
-        font-size: 11px; 
-        color: #ff9faf; 
-        float: right; 
-        font-family: 'Segoe UI', 'Inter', sans-serif;
-    }
-    h3 {
-        font-family: 'Segoe UI', 'Inter', sans-serif;
-        color: #ff7f9f;
-        margin-top: 0;
-        display: inline-block;
-    }
-    
-    /* Кнопка переключения темы */
-    .theme-toggle {
-        position: absolute;
-        top: 20px;
-        right: 20px;
-        background: #ff9faf;
-        border: none;
-        border-radius: 50%;
-        width: 40px;
-        height: 40px;
-        cursor: pointer;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 20px;
-        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-        transition: 0.3s;
-        z-index: 100;
-    }
-    .theme-toggle:hover {
-        transform: scale(1.1);
-        background: #ff7f9f;
-    }
-    body.dark-theme .theme-toggle {
-        background: #ff9faf;
-    }
-    body.dark-theme .theme-toggle:hover {
-        background: #ff7f9f;
-    }
-    
-    /* Счетчик пользователей */
-    .user-counter {
-        position: fixed;
-        bottom: 20px;
-        right: 20px;
-        background: white;
-        padding: 12px 24px;
-        border-radius: 50px;
-        box-shadow: 0 4px 15px rgba(255, 159, 175, 0.3);
-        border: 1px solid #ff9faf;
-        font-family: 'Segoe UI', 'Inter', sans-serif;
-        font-weight: 600;
-        color: #ff7f9f;
-        font-size: 16px;
-        z-index: 1000;
-        backdrop-filter: blur(5px);
-        transition: transform 0.3s ease;
-    }
-    .user-counter:hover {
-        transform: scale(1.05);
-    }
-    .user-counter i {
-        margin-right: 8px;
-        font-size: 18px;
-    }
+    body { font-family: 'Inter', sans-serif; background: #f4f7f6; display: flex; flex-direction: column; align-items: center; padding: 20px; }
+    .container { width: 100%; max-width: 500px; background: white; padding: 25px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); margin-bottom: 20px; }
+
+    /* Стиль блока авторизации */
+    .auth-bar { background: white; padding: 15px; border-radius: 12px; margin-bottom: 20px; display: flex; align-items: center; gap: 15px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
+    .user-avatar { width: 40px; height: 40px; border-radius: 50%; border: 2px solid #007bff; }
+
+    input { width: 100%; padding: 12px; margin: 8px 0; border: 1px solid #ddd; border-radius: 6px; box-sizing: border-box; }
+    button { background: #007bff; color: white; border: none; padding: 12px; border-radius: 6px; width: 100%; font-weight: 600; cursor: pointer; transition: 0.3s; }
+    button:hover { background: #0056b3; }
+    button.disabled { background: #ccc; }
+    .logout-btn { background: #ff4757; padding: 8px 15px; width: auto; font-size: 14px; }
+
+    .post { background: #fff; border: 1px solid #eaeaea; padding: 15px; margin-top: 15px; border-radius: 8px; width: 100%; max-width: 500px; }
+
+    .post { background: #fff; border: 1px solid #eaeaea; padding: 15px; margin-top: 15px; border-radius: 8px; width: 100%; max-width: 500px; }
+    .post-header { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+    .post-avatar { width: 30px; height: 30px; border-radius: 50%; }
+    .like-btn { cursor: pointer; border: none; background: #f8f9fa; padding: 5px 12px; border-radius: 20px; margin-top: 10px; }
+    .time { font-size: 11px; color: #999; margin-left: auto; }
+
     </style>
 </head>
 <body>
 
-<button class="theme-toggle" id="themeToggle" onclick="toggleTheme()">🌙</button>
-
-<!-- Счетчик пользователей -->
-<div class="user-counter" id="userCounter">
-    <span>Пользователи: <span id="userCount">0</span></span>
+<div id="authSection" class="container" style="max-width: 500px; text-align: center;">
+    <button id="loginBtn">Войти через Google/Сайт</button>
+    <div id="userInfo" style="display: none;">class="auth-bar">
+    <img id="userPhoto" class="user-avatar" src="" alt="Avatar">
+    <span id="userName" style="font-weight: bold;"></span>
+    <button id="logoutBtn" class="logout-btn">Выйти</button>
+    </div>
 </div>
 
-<div class="container">
-    <h3>Панель управления</h3>
-    <input type="text" id="name" placeholder="Имя профиля">
-    <input type="email" id="email" placeholder="Email">
-    <button id="mainBtn">Опубликовать</button>
+<div id="messageForm" class="container" style="display: none;">
+    <h3>Сохранить запись</h3>
+    <input type="text" id="name" placeholder="Имя профиля" readonly>
+    <input type="email" id="email" placeholder="E-mail" readonly>
+    <input type="text" id="content" placeholder="Nro y bac honoroj">
+    <button id="mainBtn">Oplynknovahto a ohnako</button>
 </div>
 
 <div id="feed" style="width: 100%; max-width: 500px;"></div>
 
 <script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js";
-import {
-    getFirestore, collection, addDoc, query, orderBy, onSnapshot,
-    serverTimestamp, updateDoc, doc, increment
-} from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js";
+    import { getFirestore, collection, addDoc, query, orderBy, onSnapshot, serverTimestamp, updateDoc, doc, increment } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
+    import { getAuth, signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js";
 
-const firebaseConfig = {
-  apiKey: "AIzaSyDImR-lwN-EaxHpK0kZ4jamgmlT9Vsqld8",
-  authDomain: "amamina.firebaseapp.com",
-  projectId: "amamina",
-  storageBucket: "amamina.firebasestorage.app",
-  messagingSenderId: "201925983071",
-  appId: "1:201925983071:web:0562243fe8bff512dfd4ea",
-  measurementId: "G-J41Z9MFML4"
-};
+    const firebaseConfig = {
+    apiKey: "AIzaSyDgXxR0Txafc_qA-rpdS2Kn33265IFxsH0",
+    authDomain: "qazaq-a072e.firebaseapp.com",
+    projectId: "qazaq-a072e",
+    storageBucket: "qazaq-a072e.firebasestorage.apps",
+    messagingSenderId: "47025480090",
+    appId: "1:47025480090:web:3dd74FF29b0c149f39a23",
+    measurementId: "G-9TE97NM8B9"
+    };
 
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    const auth = getUserAuth();
+    const provider = new GoogleAuthProvider();
 
-window.processLike = async (id) => {
-    const docRef = doc(db, "requests", id);
-    try {
-        await updateDoc(docRef, { likes: increment(1) });
-    } catch (e) {
-        console.error("Ошибка лайка:", e.message);
-    }
-}
+    // --- ЛОГИКА АВТОРИЗАЦИИ ---
+    const loginBtn = document.getElementById('loginBtn');
+    const logoutBtn = document.getElementById('logoutBtn');
+    const userInfo = document.getElementById('userInfo');
+    const messageForm = document.getElementById('messageForm');
 
-document.getElementById('mainBtn').onclick = async () => {
-    const btn = document.getElementById('mainBtn');
-    btn.disabled = true;
-    try {
-        await addDoc(collection(db, "requests"), {
-            name: document.getElementById('name').value,
-            email: document.getElementById('email').value,
+    loginBtn.onclick = () => signInWithPopup(auth, provider);
+    logoutBtn.onclick = () => signOut(auth);
+
+    onAuthStateChanged(auth, (user) => {
+        if (user) {
+        loginBtn.style.display = 'none';
+        userInfo.style.display = 'flex';
+        messageForm.style.display = 'block';
+        } else {
+        loginBtn.style.display = 'block';
+        userInfo.style.display = 'none';
+        messageForm.style.display = 'none';
+        }
+    });
+
+    // --- ЛОГИКА РАБОТЫ С ДАННЫМИ ---
+    window.processLine = async (id) => {
+        await updateDoc(doc(db, "requests", id), { likes: increment(1) });
+    };
+
+    document.getElementById('mainBtn').onclick = async () => {
+        const content = document.getElementById('content').value;
+        if (!content) return alert("Введите текст сообщения!");
+
+        try {
+            await addDoc(collection(db, "requests"), {
+            name: auth.currentUser.displayName,
+            email: auth.currentUser.email,
+            photo: auth.currentUser.photoURL,
+            text: content,
             likes: 0,
             timestamp: serverTimestamp()
+            });
+            document.getElementById("content").value = "";
+        } catch (e) {
+            alert("Ошибка безопасности! Проверьте правила (Rules) в Firebase.");
+        }
+    };
+
+    // --- REAL-TIME ОБНОВЛЕНИЕ ЛЕНТЫ ---
+    const q = query(collection(db, "requests"), orderBy("timestamp", "desc"));
+    onSnapshot(q, (snapshot) => {
+        const feed = document.getElementById('feed');
+        feed.innerHTML = "";
+        snapshot.forEach((doc) => {
+            const data = doc.data();
+            feed.innerHTML += `
+    <div class="post">
+        <div class="post-header">
+        <img src="${data.photo || 'https://via.placeholder.com/30'}"></div>
+        <div class="data.name"><b>${data.name}</b></div>
+        <span class="time">${data.timestamp.toDate().toLocaleTimeString()} </span>
+    </div>
+    <p>${data.text || data.email}</p>
+    <button class="like-btn" onclick="processLike('${doc.id}')"> ${data.likes || 0}</button>
+    </div>
+    `;
         });
-        document.getElementById('email').value = "";
-    } catch (e) {
-        alert("Ошибка безопасности: Данные отклонены сервером.");
-    }
-    btn.disabled = false;
-};
-
-const q = query(collection(db, "requests"), orderBy("timestamp", "desc"));
-onSnapshot(q, (snapshot) => {
-    const feed = document.getElementById('feed');
-    feed.innerHTML = "";
-    
-    // Обновляем счетчик при любом изменении в коллекции
-    document.getElementById('userCount').textContent = snapshot.size;
-    
-    snapshot.forEach((doc) => {
-        const data = doc.data();
-        feed.innerHTML += `
-        <div class="post">
-            <span class="time">${data.timestamp ? data.timestamp.toDate().toLocaleTimeString() : '...'}</span>
-            <b>${data.name}</b>
-            <p style="margin: 5px 0;">${data.email}</p>
-            <button class="like-btn" onclick="processLike('${doc.id}')">
-                👍 ${data.likes || 0}
-            </button>
-        </div>
-        `;
     });
-});
 
-// Функция переключения темы (глобальная)
-window.toggleTheme = function() {
-    const body = document.body;
-    const themeToggle = document.getElementById('themeToggle');
-    body.classList.toggle('dark-theme');
-    
-    if (body.classList.contains('dark-theme')) {
-        themeToggle.textContent = '☀️';
-    } else {
-        themeToggle.textContent = '🌙';
-    }
-}
-
-// Проверяем сохраненную тему при загрузке
-if (localStorage.getItem('theme') === 'dark') {
-    document.body.classList.add('dark-theme');
-    document.getElementById('themeToggle').textContent = '☀️';
-}
-
-// Сохраняем выбор темы
-document.getElementById('themeToggle').addEventListener('click', function() {
-    if (document.body.classList.contains('dark-theme')) {
-        localStorage.setItem('theme', 'dark');
-    } else {
-        localStorage.setItem('theme', 'light');
-    }
-});
+    window.db = db; // Для тестов в консоли F12
 </script>
+</body>
+</html><!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Облачное приложение</title>
+    <style>
+    body { font-family: 'Inter', sans-serif; background: #f4f7f6; display: flex; flex-direction: column; align-items: center; padding: 20px; }
+    .container { width: 100%; max-width: 500px; background: white; padding: 25px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); margin-bottom: 20px; }
 
+    /* Стиль блока авторизации */
+    .auth-bar { background: white; padding: 15px; border-radius: 12px; margin-bottom: 20px; display: flex; align-items: center; gap: 15px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
+    .user-avatar { width: 40px; height: 40px; border-radius: 50%; border: 2px solid #007bff; }
+
+    input { width: 100%; padding: 12px; margin: 8px 0; border: 1px solid #ddd; border-radius: 6px; box-sizing: border-box; }
+    button { background: #007bff; color: white; border: none; padding: 12px; border-radius: 6px; width: 100%; font-weight: 600; cursor: pointer; transition: 0.3s; }
+    button:hover { background: #0056b3; }
+    button.disabled { background: #ccc; }
+    .logout-btn { background: #ff4757; padding: 8px 15px; width: auto; font-size: 14px; }
+
+    .post { background: #fff; border: 1px solid #eaeaea; padding: 15px; margin-top: 15px; border-radius: 8px; width: 100%; max-width: 500px; }
+
+    .post { background: #fff; border: 1px solid #eaeaea; padding: 15px; margin-top: 15px; border-radius: 8px; width: 100%; max-width: 500px; }
+    .post-header { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+    .post-avatar { width: 30px; height: 30px; border-radius: 50%; }
+    .like-btn { cursor: pointer; border: none; background: #f8f9fa; padding: 5px 12px; border-radius: 20px; margin-top: 10px; }
+    .time { font-size: 11px; color: #999; margin-left: auto; }
+
+    </style>
+</head>
+<body>
+
+<div id="authSection" class="container" style="max-width: 500px; text-align: center;">
+    <button id="loginBtn">Войти через Google/Сайт</button>
+    <div id="userInfo" style="display: none;">class="auth-bar">
+    <img id="userPhoto" class="user-avatar" src="" alt="Avatar">
+    <span id="userName" style="font-weight: bold;"></span>
+    <button id="logoutBtn" class="logout-btn">Выйти</button>
+    </div>
+</div>
+
+<div id="messageForm" class="container" style="display: none;">
+    <h3>Сохранить запись</h3>
+    <input type="text" id="name" placeholder="Имя профиля" readonly>
+    <input type="email" id="email" placeholder="E-mail" readonly>
+    <input type="text" id="content" placeholder="Nro y bac honoroj">
+    <button id="mainBtn">Oplynknovahto a ohnako</button>
+</div>
+
+<div id="feed" style="width: 100%; max-width: 500px;"></div>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js";
+    import { getFirestore, collection, addDoc, query, orderBy, onSnapshot, serverTimestamp, updateDoc, doc, increment } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
+    import { getAuth, signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js";
+
+    const firebaseConfig = {
+    apiKey: "AIzaSyDgXxR0Txafc_qA-rpdS2Kn33265IFxsH0",
+    authDomain: "qazaq-a072e.firebaseapp.com",
+    projectId: "qazaq-a072e",
+    storageBucket: "qazaq-a072e.firebasestorage.apps",
+    messagingSenderId: "47025480090",
+    appId: "1:47025480090:web:3dd74FF29b0c149f39a23",
+    measurementId: "G-9TE97NM8B9"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    const auth = getUserAuth();
+    const provider = new GoogleAuthProvider();
+
+    // --- ЛОГИКА АВТОРИЗАЦИИ ---
+    const loginBtn = document.getElementById('loginBtn');
+    const logoutBtn = document.getElementById('logoutBtn');
+    const userInfo = document.getElementById('userInfo');
+    const messageForm = document.getElementById('messageForm');
+
+    loginBtn.onclick = () => signInWithPopup(auth, provider);
+    logoutBtn.onclick = () => signOut(auth);
+
+    onAuthStateChanged(auth, (user) => {
+        if (user) {
+        loginBtn.style.display = 'none';
+        userInfo.style.display = 'flex';
+        messageForm.style.display = 'block';
+        } else {
+        loginBtn.style.display = 'block';
+        userInfo.style.display = 'none';
+        messageForm.style.display = 'none';
+        }
+    });
+
+    // --- ЛОГИКА РАБОТЫ С ДАННЫМИ ---
+    window.processLine = async (id) => {
+        await updateDoc(doc(db, "requests", id), { likes: increment(1) });
+    };
+
+    document.getElementById('mainBtn').onclick = async () => {
+        const content = document.getElementById('content').value;
+        if (!content) return alert("Введите текст сообщения!");
+
+        try {
+            await addDoc(collection(db, "requests"), {
+            name: auth.currentUser.displayName,
+            email: auth.currentUser.email,
+            photo: auth.currentUser.photoURL,
+            text: content,
+            likes: 0,
+            timestamp: serverTimestamp()
+            });
+            document.getElementById("content").value = "";
+        } catch (e) {
+            alert("Ошибка безопасности! Проверьте правила (Rules) в Firebase.");
+        }
+    };
+
+    // --- REAL-TIME ОБНОВЛЕНИЕ ЛЕНТЫ ---
+    const q = query(collection(db, "requests"), orderBy("timestamp", "desc"));
+    onSnapshot(q, (snapshot) => {
+        const feed = document.getElementById('feed');
+        feed.innerHTML = "";
+        snapshot.forEach((doc) => {
+            const data = doc.data();
+            feed.innerHTML += `
+    <div class="post">
+        <div class="post-header">
+        <img src="${data.photo || 'https://via.placeholder.com/30'}"></div>
+        <div class="data.name"><b>${data.name}</b></div>
+        <span class="time">${data.timestamp.toDate().toLocaleTimeString()} </span>
+    </div>
+    <p>${data.text || data.email}</p>
+    <button class="like-btn" onclick="processLike('${doc.id}')"> ${data.likes || 0}</button>
+    </div>
+    `;
+        });
+    });
+
+    window.db = db; // Для тестов в консоли F12
+</script>
 </body>
 </html>
