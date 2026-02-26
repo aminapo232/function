@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Чат</title>
+    <title>Чат с Алмасом</title>
     <style>
         * {
             margin: 0;
@@ -21,79 +21,8 @@
             padding: 20px;
         }
 
-        /* Шапка с пользователем */
-        .header {
-            width: 100%;
-            max-width: 600px;
-            background: white;
-            border-radius: 12px;
-            padding: 16px 20px;
-            margin-bottom: 20px;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.05);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .user-info {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
-        .user-avatar {
-            width: 45px;
-            height: 45px;
-            border-radius: 50%;
-            object-fit: cover;
-            border: 2px solid #e4e6eb;
-        }
-
-        .user-name {
-            font-weight: 600;
-            color: #050505;
-            font-size: 16px;
-        }
-
-        .user-email {
-            color: #65676b;
-            font-size: 13px;
-        }
-
-        .login-btn {
-            background: #1877f2;
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 8px;
-            font-weight: 600;
-            font-size: 15px;
-            cursor: pointer;
-            transition: background 0.2s;
-        }
-
-        .login-btn:hover {
-            background: #166fe5;
-        }
-
-        .logout-btn {
-            background: #e4e6eb;
-            color: #050505;
-            border: none;
-            padding: 8px 16px;
-            border-radius: 8px;
-            font-weight: 600;
-            font-size: 14px;
-            cursor: pointer;
-            transition: background 0.2s;
-        }
-
-        .logout-btn:hover {
-            background: #d8dadf;
-        }
-
-        /* Основной контейнер */
-        .chat-container {
+        /* Контейнер чата */
+        .chat-wrapper {
             width: 100%;
             max-width: 600px;
             background: white;
@@ -105,7 +34,86 @@
             height: 80vh;
         }
 
-        /* Список сообщений */
+        /* Шапка */
+        .header {
+            background: #1877f2;
+            color: white;
+            padding: 16px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .chat-title {
+            font-weight: 600;
+            font-size: 18px;
+        }
+
+        .chat-subtitle {
+            font-size: 13px;
+            opacity: 0.9;
+        }
+
+        .login-btn {
+            background: white;
+            color: #1877f2;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 14px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .login-btn:hover {
+            background: #f0f2f5;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            border: 2px solid white;
+            object-fit: cover;
+        }
+
+        .user-details {
+            text-align: right;
+        }
+
+        .user-name {
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .user-email {
+            font-size: 12px;
+            opacity: 0.8;
+        }
+
+        .logout-btn {
+            background: rgba(255,255,255,0.2);
+            color: white;
+            border: 1px solid rgba(255,255,255,0.4);
+            padding: 6px 12px;
+            border-radius: 16px;
+            font-size: 12px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .logout-btn:hover {
+            background: rgba(255,255,255,0.3);
+        }
+
+        /* Сообщения */
         .messages {
             flex: 1;
             overflow-y: auto;
@@ -141,7 +149,6 @@
             padding: 12px 16px;
             border-radius: 18px;
             box-shadow: 0 1px 2px rgba(0,0,0,0.1);
-            position: relative;
         }
 
         .my-message .message-content {
@@ -206,6 +213,11 @@
             border-color: #1877f2;
         }
 
+        .message-input:disabled {
+            background: #f5f5f5;
+            cursor: not-allowed;
+        }
+
         .send-btn {
             background: #1877f2;
             color: white;
@@ -236,70 +248,37 @@
             fill: currentColor;
         }
 
-        /* Индикатор печати */
-        .typing-indicator {
-            padding: 10px 20px;
-            color: #65676b;
-            font-size: 13px;
-            background: #fafafa;
-            border-top: 1px solid #e4e6eb;
-            display: none;
-        }
-
-        .typing-indicator.active {
-            display: block;
-        }
-
-        /* Выбор собеседника */
-        .contact-selector {
-            padding: 16px;
-            background: white;
-            border-bottom: 1px solid #e4e6eb;
-        }
-
-        .contact-label {
-            font-size: 13px;
-            color: #65676b;
-            margin-bottom: 8px;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        .contact-list {
+        /* Приглашение к входу */
+        .login-prompt {
+            flex: 1;
             display: flex;
-            gap: 12px;
-        }
-
-        .contact-item {
-            display: flex;
+            flex-direction: column;
             align-items: center;
-            gap: 8px;
-            padding: 8px 12px;
-            border-radius: 24px;
-            background: #f0f2f5;
+            justify-content: center;
+            gap: 20px;
+            background: #fafafa;
+            padding: 40px;
+        }
+
+        .login-prompt p {
+            color: #65676b;
+            font-size: 16px;
+        }
+
+        .login-prompt-btn {
+            background: #1877f2;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 30px;
+            font-weight: 600;
+            font-size: 16px;
             cursor: pointer;
             transition: background 0.2s;
         }
 
-        .contact-item.active {
-            background: #e7f3ff;
-            border: 1px solid #1877f2;
-        }
-
-        .contact-item:hover {
-            background: #e4e6eb;
-        }
-
-        .contact-avatar {
-            width: 24px;
-            height: 24px;
-            border-radius: 50%;
-            object-fit: cover;
-        }
-
-        .contact-name {
-            font-weight: 500;
-            font-size: 14px;
+        .login-prompt-btn:hover {
+            background: #166fe5;
         }
 
         @keyframes fadeIn {
@@ -309,63 +288,58 @@
     </style>
 </head>
 <body>
-    <!-- Шапка с пользователем -->
-    <div class="header">
-        <div id="userInfo" class="user-info" style="display: none;">
-            <img id="userPhoto" class="user-avatar" src="" alt="Avatar">
+    <div class="chat-wrapper">
+        <!-- Шапка -->
+        <div class="header">
             <div>
-                <div id="userDisplayName" class="user-name"></div>
-                <div id="userEmail" class="user-email"></div>
+                <div class="chat-title">Чат с Алмасом</div>
+                <div class="chat-subtitle">личный диалог</div>
             </div>
-        </div>
-        <button id="loginBtn" class="login-btn">Войти</button>
-        <button id="logoutBtn" class="logout-btn" style="display: none;">Выйти</button>
-    </div>
-
-    <!-- Чат -->
-    <div class="chat-container">
-        <!-- Выбор собеседника -->
-        <div class="contact-selector">
-            <div class="contact-label">Выберите собеседника:</div>
-            <div class="contact-list" id="contactList">
-                <div class="contact-item active" data-contact="A">
-                    <img src="https://via.placeholder.com/24/1877f2/ffffff?text=A" class="contact-avatar" alt="A">
-                    <span class="contact-name">A</span>
-                </div>
-                <div class="contact-item" data-contact="Алмас">
-                    <img src="https://via.placeholder.com/24/42b72a/ffffff?text=А" class="contact-avatar" alt="Алмас">
-                    <span class="contact-name">Алмас</span>
+            
+            <!-- Блок авторизации -->
+            <div id="unauthBlock">
+                <button id="loginBtn" class="login-btn">Войти</button>
+            </div>
+            
+            <div id="authBlock" style="display: none;">
+                <div class="user-info">
+                    <img id="userPhoto" class="user-avatar" src="" alt="Avatar">
+                    <div class="user-details">
+                        <div id="userName" class="user-name"></div>
+                        <div id="userEmail" class="user-email"></div>
+                    </div>
+                    <button id="logoutBtn" class="logout-btn">Выйти</button>
                 </div>
             </div>
         </div>
 
-        <!-- Заголовок чата -->
-        <div style="padding: 16px; border-bottom: 1px solid #e4e6eb; background: white;">
-            <div style="font-weight: 600; font-size: 16px;">Чат с: <span id="chatWith">A</span> Дуйсенбек</div>
-        </div>
-
-        <!-- Сообщения -->
-        <div id="messages" class="messages"></div>
-
-        <!-- Индикатор печати -->
-        <div id="typingIndicator" class="typing-indicator"></div>
-
-        <!-- Форма отправки сообщения -->
-        <div class="message-form">
-            <div class="message-input-wrapper">
-                <textarea 
-                    id="messageInput" 
-                    class="message-input" 
-                    placeholder="Ваше сообщение..."
-                    rows="1"
-                    disabled
-                ></textarea>
+        <!-- Контент (меняется в зависимости от авторизации) -->
+        <div id="chatContent" style="display: flex; flex-direction: column; height: 100%;">
+            <!-- Сообщения (показываются только после входа) -->
+            <div id="messagesContainer" class="messages" style="display: none;"></div>
+            
+            <!-- Приглашение к входу (показывается если не авторизован) -->
+            <div id="loginPrompt" class="login-prompt">
+                <p>Войдите, чтобы начать общение</p>
+                <button id="promptLoginBtn" class="login-prompt-btn">Войти через Google</button>
             </div>
-            <button id="sendBtn" class="send-btn" disabled>
-                <svg viewBox="0 0 24 24">
-                    <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/>
-                </svg>
-            </button>
+            
+            <!-- Форма отправки (показывается только после входа) -->
+            <div id="messageForm" class="message-form" style="display: none;">
+                <div class="message-input-wrapper">
+                    <textarea 
+                        id="messageInput" 
+                        class="message-input" 
+                        placeholder="Ваше сообщение..."
+                        rows="1"
+                    ></textarea>
+                </div>
+                <button id="sendBtn" class="send-btn">
+                    <svg viewBox="0 0 24 24">
+                        <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/>
+                    </svg>
+                </button>
+            </div>
         </div>
     </div>
 
@@ -410,35 +384,42 @@
             prompt: 'select_account'
         });
 
+        // Константы чата
+        const CHAT_PARTNER = {
+            name: 'Алмас',
+            email: 'almas@example.com' // Замените на реальный email Алмаса
+        };
+
         // DOM элементы
         const loginBtn = document.getElementById('loginBtn');
+        const promptLoginBtn = document.getElementById('promptLoginBtn');
         const logoutBtn = document.getElementById('logoutBtn');
-        const userInfo = document.getElementById('userInfo');
+        const unauthBlock = document.getElementById('unauthBlock');
+        const authBlock = document.getElementById('authBlock');
         const userPhoto = document.getElementById('userPhoto');
-        const userDisplayName = document.getElementById('userDisplayName');
+        const userName = document.getElementById('userName');
         const userEmail = document.getElementById('userEmail');
-        const messagesDiv = document.getElementById('messages');
+        const messagesContainer = document.getElementById('messagesContainer');
+        const loginPrompt = document.getElementById('loginPrompt');
+        const messageForm = document.getElementById('messageForm');
         const messageInput = document.getElementById('messageInput');
         const sendBtn = document.getElementById('sendBtn');
-        const chatWith = document.getElementById('chatWith');
-        const contactItems = document.querySelectorAll('.contact-item');
-        const typingIndicator = document.getElementById('typingIndicator');
 
         // Состояние
         let currentUser = null;
-        let selectedContact = 'A'; // По умолчанию собеседник A
         let unsubscribeMessages = null;
         let typingTimeout = null;
 
         // --- Авторизация ---
-        loginBtn.addEventListener('click', async () => {
-            try {
-                await signInWithPopup(auth, provider);
-            } catch (error) {
+        function handleLogin() {
+            signInWithPopup(auth, provider).catch(error => {
                 console.error('Ошибка входа:', error);
                 alert('Ошибка входа: ' + error.message);
-            }
-        });
+            });
+        }
+
+        loginBtn.addEventListener('click', handleLogin);
+        promptLoginBtn.addEventListener('click', handleLogin);
 
         logoutBtn.addEventListener('click', async () => {
             try {
@@ -448,37 +429,39 @@
             }
         });
 
+        // Отслеживаем состояние авторизации
         onAuthStateChanged(auth, (user) => {
             currentUser = user;
             
             if (user) {
-                // Показываем информацию о пользователе
-                loginBtn.style.display = 'none';
-                logoutBtn.style.display = 'block';
-                userInfo.style.display = 'flex';
+                // Показываем блок с пользователем
+                unauthBlock.style.display = 'none';
+                authBlock.style.display = 'block';
                 
-                userPhoto.src = user.photoURL || 'https://via.placeholder.com/45';
-                userDisplayName.textContent = user.displayName || 'Пользователь';
+                // Заполняем информацию о пользователе
+                userPhoto.src = user.photoURL || 'https://via.placeholder.com/40';
+                userName.textContent = user.displayName || 'Пользователь';
                 userEmail.textContent = user.email || '';
                 
-                // Активируем ввод
-                messageInput.disabled = false;
-                sendBtn.disabled = false;
+                // Показываем чат
+                loginPrompt.style.display = 'none';
+                messagesContainer.style.display = 'flex';
+                messageForm.style.display = 'flex';
                 
                 // Загружаем сообщения
                 loadMessages();
             } else {
-                // Скрываем информацию о пользователе
-                loginBtn.style.display = 'block';
-                logoutBtn.style.display = 'none';
-                userInfo.style.display = 'none';
+                // Показываем блок входа
+                unauthBlock.style.display = 'block';
+                authBlock.style.display = 'none';
                 
-                // Деактивируем ввод
-                messageInput.disabled = true;
-                sendBtn.disabled = true;
+                // Показываем приглашение к входу
+                loginPrompt.style.display = 'flex';
+                messagesContainer.style.display = 'none';
+                messageForm.style.display = 'none';
                 
                 // Очищаем сообщения
-                messagesDiv.innerHTML = '<div style="text-align: center; color: #65676b; margin-top: 20px;">Войдите, чтобы начать общение</div>';
+                messagesContainer.innerHTML = '';
                 
                 // Отписываемся от сообщений
                 if (unsubscribeMessages) {
@@ -486,24 +469,6 @@
                     unsubscribeMessages = null;
                 }
             }
-        });
-
-        // --- Выбор собеседника ---
-        contactItems.forEach(item => {
-            item.addEventListener('click', () => {
-                // Обновляем активный класс
-                contactItems.forEach(i => i.classList.remove('active'));
-                item.classList.add('active');
-                
-                // Обновляем выбранного собеседника
-                selectedContact = item.dataset.contact;
-                chatWith.textContent = selectedContact;
-                
-                // Перезагружаем сообщения
-                if (currentUser) {
-                    loadMessages();
-                }
-            });
         });
 
         // --- Загрузка сообщений ---
@@ -514,24 +479,24 @@
 
             if (!currentUser) return;
 
-            // Создаем составной ID для чата (сортируем имена для уникальности)
-            const participants = [currentUser.email, selectedContact].sort();
+            // Создаем уникальный ID для этого чата (между текущим пользователем и Алмасом)
+            const participants = [currentUser.email, CHAT_PARTNER.email].sort();
             const chatId = `chat_${participants[0]}_${participants[1]}`.replace(/[^a-zA-Z0-9]/g, '_');
 
             const q = query(
                 collection(db, "messages"),
                 where("chatId", "==", chatId),
                 orderBy("timestamp", "asc"),
-                limit(50)
+                limit(100)
             );
 
             unsubscribeMessages = onSnapshot(q, (snapshot) => {
                 if (snapshot.empty) {
-                    messagesDiv.innerHTML = '<div style="text-align: center; color: #65676b; margin-top: 20px;">Нет сообщений. Начните диалог!</div>';
+                    messagesContainer.innerHTML = '<div style="text-align: center; color: #65676b; margin-top: 20px;">Нет сообщений. Напишите Алмасу!</div>';
                     return;
                 }
 
-                messagesDiv.innerHTML = '';
+                messagesContainer.innerHTML = '';
                 
                 snapshot.forEach((doc) => {
                     const data = doc.data();
@@ -539,7 +504,7 @@
                 });
                 
                 // Скролл вниз
-                messagesDiv.scrollTop = messagesDiv.scrollHeight;
+                messagesContainer.scrollTop = messagesContainer.scrollHeight;
             }, (error) => {
                 console.error('Ошибка загрузки сообщений:', error);
             });
@@ -550,7 +515,7 @@
             const messageDiv = document.createElement('div');
             messageDiv.className = 'message';
             
-            // Определяем, наше это сообщение или нет
+            // Определяем, наше это сообщение или от Алмаса
             if (data.senderEmail === currentUser?.email) {
                 messageDiv.classList.add('my-message');
             }
@@ -569,14 +534,14 @@
                 <img src="${data.senderPhoto || 'https://via.placeholder.com/36'}" class="message-avatar" alt="Avatar" onerror="this.src='https://via.placeholder.com/36'">
                 <div class="message-content">
                     <div class="message-header">
-                        <span class="message-author">${data.senderName || 'Пользователь'}</span>
+                        <span class="message-author">${data.senderName === currentUser?.displayName ? 'Вы' : data.senderName}</span>
                         <span class="message-time">${timeStr}</span>
                     </div>
                     <div class="message-text">${data.text.replace(/</g, '&lt;').replace(/>/g, '&gt;')}</div>
                 </div>
             `;
             
-            messagesDiv.appendChild(messageDiv);
+            messagesContainer.appendChild(messageDiv);
         }
 
         // --- Отправка сообщения ---
@@ -589,33 +554,14 @@
             }
         });
 
-        // Индикатор печати
-        messageInput.addEventListener('input', () => {
-            if (!currentUser) return;
-            
-            // Показываем индикатор печати
-            typingIndicator.textContent = `${currentUser.displayName || 'Пользователь'} печатает...`;
-            typingIndicator.classList.add('active');
-            
-            // Очищаем предыдущий таймаут
-            if (typingTimeout) {
-                clearTimeout(typingTimeout);
-            }
-            
-            // Скрываем индикатор через 2 секунды бездействия
-            typingTimeout = setTimeout(() => {
-                typingIndicator.classList.remove('active');
-            }, 2000);
-        });
-
         async function sendMessage() {
             const text = messageInput.value.trim();
             
-            if (!text || !currentUser || !selectedContact) return;
+            if (!text || !currentUser) return;
             
             try {
-                // Создаем составной ID для чата
-                const participants = [currentUser.email, selectedContact].sort();
+                // Создаем уникальный ID для этого чата
+                const participants = [currentUser.email, CHAT_PARTNER.email].sort();
                 const chatId = `chat_${participants[0]}_${participants[1]}`.replace(/[^a-zA-Z0-9]/g, '_');
                 
                 // Сохраняем сообщение
@@ -625,15 +571,14 @@
                     senderEmail: currentUser.email,
                     senderName: currentUser.displayName || 'Пользователь',
                     senderPhoto: currentUser.photoURL || '',
-                    recipient: selectedContact,
+                    recipientEmail: CHAT_PARTNER.email,
+                    recipientName: CHAT_PARTNER.name,
                     timestamp: serverTimestamp()
                 });
                 
                 // Очищаем поле ввода
                 messageInput.value = '';
-                
-                // Скрываем индикатор печати
-                typingIndicator.classList.remove('active');
+                messageInput.style.height = 'auto';
                 
             } catch (error) {
                 console.error('Ошибка отправки:', error);
