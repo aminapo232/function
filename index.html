@@ -5,112 +5,22 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Supabase Status Monitor</title>
     <style>
-        body { font-family: 'Segoe UI', sans-serif; background: #ffe4ec; display: flex; flex-direction: column; align-items: center; padding: 20px; }
-        .card { background: #fff0f5; padding: 20px; border-radius: 12px; box-shadow: 0 4px 12px rgba(255, 105, 180, 0.2); width: 100%; max-width: 500px; margin-bottom: 20px; border: 1px solid #ffb6c1; }
-        .user-item { display: flex; align-items: center; gap: 15px; padding: 10px; border-bottom: 1px solid #ffb6c1; transition: 0.3s; }
-        .status-dot { width: 12px; height: 12px; border-radius: 50%; }
-        .controls { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-        button { padding: 10px; border: none; border-radius: 6px; cursor: pointer; font-weight: 600; color: white; transition: 0.2s; }
-        button:hover { opacity: 0.8; transform: translateY(-2px); }
-        .btn-study { background: #d87093; }
-        .btn-coffee { background: #fba0b3; color: white; }
-        .btn-home { background: #db7090; }
-        .btn-game { background: #c06c84; }
-        h3 { color: #b13e6d; }
-        #myInfo { color: #a34e6a; }
-        #groupList { color: #a34e6a; }
-    </style>
-</head>
-<body>
-
-    <div class="card">
-        <h3>Мой профиль</h3>
-        <p id="myInfo">Загрузка...</p>
-        <div class="controls">
-            <button class="btn-study" onclick="changeStatus('📚 Учусь', '#d87093')">📚 Учусь</button>
-            <button class="btn-coffee" onclick="changeStatus('☕ Кофе-брейк', '#fba0b3')">☕ Кофе</button>
-            <button class="btn-game" onclick="changeStatus('🎮 В игре', '#c06c84')">🎮 В игре</button>
-            <button class="btn-home" onclick="changeStatus('🏠 Дома', '#db7090')">🏠 Дома</button>
-        </div>
-    </div>
-
-    <div class="card">
-        <h3>Монитор группы</h3>
-        <div id="groupList">Поиск студентов...</div>
-    </div>
-
-    <script type="module">
-        import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm'
-
-        const URL = 'https://aclksvnlhxryvmkhwlax.supabase.co';
-        const KEY = 'sb_publishable_5PcgEIZhvrleB5p0HKUomQ_L_arGn1H';
-        const supabase = createClient(URL, KEY);
-
-        const MY_ID = '20781a82-b531-4458-8ac3-be91645b55c7'; 
-
-        window.changeStatus = async (text, color) => {
-            const { error } = await supabase
-                .from('profiles')
-                .update({ status: text })
-                .eq('id', MY_ID);
-
-            if (error) {
-                alert("Ошибка! Проверьте RLS политики в Supabase.");
-                console.error(error);
-            } else {
-                fetchGroup();
-            }
-        };
-
-        async function fetchGroup() {
-            const { data, error } = await supabase
-                .from('profiles')
-                .select('*')
-                .order('username', { ascending: true });
-
-            if (error) return console.error(error);
-
-            const list = document.getElementById('groupList');
-            list.innerHTML = data.map(user => `
-                <div class="user-item">
-                    <div class="status-dot" style="background: ${user.color || '#f5a3c7'}"></div>
-                    <div style="flex-grow: 1;">
-                        <strong style="color: #b13e6d;">${user.username}</strong><br>
-                        <small style="color: #c06c84;">${user.status || 'Статус не задан'}</small>
-                    </div>
-                </div>
-            `).join('');
-
-            const me = data.find(u => u.id === MY_ID);
-            if (me) document.getElementById('myInfo').innerText = `Вы зашли как: ${me.username}`;
-        }
-
-        fetchGroup();
-
-        setInterval(fetchGroup, 5000);
-    </script>
-</body>
-</html><!DOCTYPE html>
-<html lang="ru">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Supabase Status Monitor</title>
-    <style>
-        body { font-family: 'Segoe UI', sans-serif; background: #ffe4ec; display: flex; flex-direction: column; align-items: center; padding: 20px; }
-        .card { background: #fff0f5; padding: 20px; border-radius: 12px; box-shadow: 0 4px 12px rgba(255, 105, 180, 0.2); width: 100%; max-width: 500px; margin-bottom: 20px; border: 1px solid #ffb6c1; }
-        .user-item { display: flex; align-items: center; gap: 15px; padding: 10px; border-bottom: 1px solid #ffb6c1; transition: 0.3s; }
-        .status-dot { width: 12px; height: 12px; border-radius: 50%; }
-        .controls { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-        button { padding: 10px; border: none; border-radius: 6px; cursor: pointer; font-weight: 600; color: white; transition: 0.2s; }
-        button:hover { opacity: 0.8; transform: translateY(-2px); }
-        .btn-study { background: #d87093; }
-        .btn-coffee { background: #fba0b3; color: white; }
-        .btn-home { background: #db7090; }
-        .btn-game { background: #c06c84; }
-        h3 { color: #b13e6d; }
-        #myInfo { color: #a34e6a; }
-        #groupList { color: #a34e6a; }
+        ```css
+body { font-family: 'Segoe UI', sans-serif; background: #ffe4ec; display: flex; flex-direction: column; align-items: center; padding: 20px; }
+.card { background: #fff0f5; padding: 20px; border-radius: 12px; box-shadow: 0 4px 12px rgba(255, 105, 180, 0.2); width: 100%; max-width: 500px; margin-bottom: 20px; border: 1px solid #ffb6c1; }
+.user-item { display: flex; align-items: center; gap: 15px; padding: 10px; border-bottom: 1px solid #ffb6c1; transition: 0.3s; }
+.status-dot { width: 12px; height: 12px; border-radius: 50%; }
+.controls { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+button { padding: 10px; border: none; border-radius: 6px; cursor: pointer; font-weight: 600; color: white; transition: 0.2s; }
+button:hover { opacity: 0.8; transform: translateY(-2px); }
+.btn-study { background: #d87093; }
+.btn-coffee { background: #fba0b3; color: white; }
+.btn-home { background: #db7090; }
+.btn-game { background: #c06c84; }
+h3 { color: #b13e6d; }
+#myInfo { color: #a34e6a; }
+#groupList { color: #a34e6a; }
+```
     </style>
 </head>
 <body>
