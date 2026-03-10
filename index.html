@@ -5,29 +5,88 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Supabase Status Monitor</title>
     <style>
-        ```css
-body { font-family: 'Segoe UI', sans-serif; background: #ffe4ec; display: flex; flex-direction: column; align-items: center; padding: 20px; }
-.card { background: #fff0f5; padding: 20px; border-radius: 12px; box-shadow: 0 4px 12px rgba(255, 105, 180, 0.2); width: 100%; max-width: 500px; margin-bottom: 20px; border: 1px solid #ffb6c1; }
-.user-item { display: flex; align-items: center; gap: 15px; padding: 10px; border-bottom: 1px solid #ffb6c1; transition: 0.3s; }
-.status-dot { width: 12px; height: 12px; border-radius: 50%; }
-.controls { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-button { padding: 10px; border: none; border-radius: 6px; cursor: pointer; font-weight: 600; color: white; transition: 0.2s; }
-button:hover { opacity: 0.8; transform: translateY(-2px); }
-.btn-study { background: #d87093; }
-.btn-coffee { background: #fba0b3; color: white; }
-.btn-home { background: #db7090; }
-.btn-game { background: #c06c84; }
-h3 { color: #b13e6d; }
-#myInfo { color: #a34e6a; }
-#groupList { color: #a34e6a; }
-```
+        body { 
+            font-family: 'Segoe UI', sans-serif; 
+            background: #ffe4ec; 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+        .card { 
+            background: #fff0f5; 
+            padding: 20px; 
+            border-radius: 12px; 
+            box-shadow: 0 4px 12px rgba(255, 105, 180, 0.2); 
+            width: 100%; 
+            max-width: 500px; 
+            margin-bottom: 20px; 
+            border: 1px solid #ffb6c1; 
+        }
+        .user-item { 
+            display: flex; 
+            align-items: center; 
+            gap: 15px; 
+            padding: 10px; 
+            border-bottom: 1px solid #ffb6c1; 
+            transition: 0.3s; 
+        }
+        .status-dot { 
+            width: 12px; 
+            height: 12px; 
+            border-radius: 50%; 
+        }
+        .controls { 
+            display: grid; 
+            grid-template-columns: 1fr 1fr; 
+            gap: 10px; 
+        }
+        button { 
+            padding: 10px; 
+            border: none; 
+            border-radius: 6px; 
+            cursor: pointer; 
+            font-weight: 600; 
+            color: white; 
+            transition: 0.2s; 
+        }
+        button:hover { 
+            opacity: 0.8; 
+            transform: translateY(-2px); 
+        }
+        .btn-study { 
+            background: #d87093; 
+        }
+        .btn-coffee { 
+            background: #fba0b3; 
+            color: white; 
+        }
+        .btn-home { 
+            background: #db7090; 
+        }
+        .btn-game { 
+            background: #c06c84; 
+        }
+        h3 { 
+            color: #b13e6d; 
+            margin-top: 0;
+        }
+        #myInfo { 
+            color: #a34e6a; 
+        }
+        #groupList { 
+            color: #a34e6a; 
+        }
     </style>
 </head>
 <body>
-
     <div class="card">
         <h3>Мой профиль</h3>
-        <p id="myInfo">Загрузка...</p>
+        <p id="myInfo">Вы зашли как: Amina</p>
         <div class="controls">
             <button class="btn-study" onclick="changeStatus('📚 Учусь', '#d87093')">📚 Учусь</button>
             <button class="btn-coffee" onclick="changeStatus('☕ Кофе-брейк', '#fba0b3')">☕ Кофе</button>
@@ -38,7 +97,15 @@ h3 { color: #b13e6d; }
 
     <div class="card">
         <h3>Монитор группы</h3>
-        <div id="groupList">Поиск студентов...</div>
+        <div id="groupList">
+            <div class="user-item">
+                <div class="status-dot" style="background: #db7090"></div>
+                <div style="flex-grow: 1;">
+                    <strong style="color: #b13e6d;">Amina</strong><br>
+                    <small style="color: #c06c84;">🏠 Дома</small>
+                </div>
+            </div>
+        </div>
     </div>
 
     <script type="module">
@@ -88,7 +155,6 @@ h3 { color: #b13e6d; }
         }
 
         fetchGroup();
-
         setInterval(fetchGroup, 5000);
     </script>
 </body>
