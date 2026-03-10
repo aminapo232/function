@@ -1,705 +1,90 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>pink chat — личные сообщения</title>
-  
-  <!-- Подключаем красивые шрифты -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600;700&family=Comfortaa:wght@400;500;600&family=Montserrat+Alternates:wght@400;500;600&display=swap" rel="stylesheet">
-  
-  <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
-
-    body {
-      min-height: 100vh;
-      background: linear-gradient(145deg, #fff5f8 0%, #ffe4ec 100%);
-      font-family: 'Quicksand', 'Comfortaa', 'Montserrat Alternates', sans-serif;
-      padding: 20px;
-      color: #4a2b3a;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-    }
-
-    /* Главный контейнер */
-    .chat-wrapper {
-      width: 100%;
-      max-width: 520px;
-      margin: 0 auto;
-    }
-
-    /* Стили для всех контейнеров */
-    .pink-container {
-      background: rgba(255, 255, 255, 0.85);
-      backdrop-filter: blur(10px);
-      -webkit-backdrop-filter: blur(10px);
-      border-radius: 32px;
-      box-shadow: 0 20px 40px rgba(255, 120, 160, 0.25), 0 8px 16px rgba(0, 0, 0, 0.05);
-      overflow: hidden;
-      border: 1px solid rgba(255, 200, 220, 0.5);
-      margin-bottom: 16px;
-    }
-
-    /* Экран входа */
-    #auth-screen {
-      text-align: center;
-      padding: 48px 24px;
-    }
-
-    .pink-title {
-      font-family: 'Comfortaa', cursive;
-      font-size: 32px;
-      font-weight: 700;
-      background: linear-gradient(135deg, #ff6b9d, #ff3388);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      margin-bottom: 12px;
-      letter-spacing: -0.5px;
-    }
-
-    .pink-subtitle {
-      font-family: 'Quicksand', sans-serif;
-      color: #b35f7a;
-      margin-bottom: 40px;
-      font-size: 16px;
-      font-weight: 500;
-    }
-
-    /* Кнопки */
-    .pink-btn {
-      background: linear-gradient(135deg, #ff8eb5, #ff6b9d);
-      border: none;
-      padding: 14px 32px;
-      border-radius: 40px;
-      font-family: 'Montserrat Alternates', sans-serif;
-      font-weight: 600;
-      font-size: 16px;
-      color: white;
-      cursor: pointer;
-      box-shadow: 0 8px 16px rgba(255, 107, 157, 0.3);
-      transition: all 0.3s ease;
-      border: 1px solid rgba(255, 255, 255, 0.3);
-      letter-spacing: 0.5px;
-    }
-
-    .pink-btn:hover {
-      transform: translateY(-3px);
-      box-shadow: 0 12px 24px rgba(255, 107, 157, 0.4);
-      background: linear-gradient(135deg, #ff9ec2, #ff7aa8);
-    }
-
-    .pink-btn-outline {
-      background: rgba(255, 255, 255, 0.7);
-      color: #ff6b9d;
-      box-shadow: 0 4px 12px rgba(255, 107, 157, 0.2);
-    }
-
-    .pink-btn-outline:hover {
-      background: white;
-    }
-
-    .logout-btn {
-      background: rgba(255, 255, 255, 0.7);
-      color: #b35f7a;
-      box-shadow: none;
-      padding: 8px 16px;
-      font-size: 14px;
-    }
-
-    .logout-btn:hover {
-      background: white;
-      color: #ff3388;
-      transform: none;
-      box-shadow: 0 4px 12px rgba(255, 107, 157, 0.2);
-    }
-
-    /* Панель пользователя */
-    #user-panel {
-      padding: 24px;
-      display: flex;
-      align-items: center;
-      gap: 16px;
-      background: rgba(255, 240, 245, 0.7);
-    }
-
-    .user-avatar {
-      width: 60px;
-      height: 60px;
-      border-radius: 30px;
-      object-fit: cover;
-      border: 3px solid white;
-      box-shadow: 0 4px 12px rgba(255, 120, 160, 0.4);
-    }
-
-    .user-info {
-      flex: 1;
-    }
-
-    .user-name {
-      font-family: 'Comfortaa', cursive;
-      font-weight: 700;
-      font-size: 18px;
-      color: #4a2b3a;
-      margin-bottom: 4px;
-    }
-
-    .user-email {
-      font-family: 'Quicksand', sans-serif;
-      font-size: 13px;
-      color: #b35f7a;
-    }
-
-    /* Список пользователей */
-    .users-header {
-      padding: 20px 24px;
-      border-bottom: 1px solid rgba(255, 200, 220, 0.5);
-      background: rgba(255, 240, 245, 0.5);
-    }
-
-    .users-header h2 {
-      font-family: 'Comfortaa', cursive;
-      font-size: 22px;
-      font-weight: 600;
-      color: #ff3388;
-    }
-
-    .users-list {
-      padding: 16px;
-      max-height: 400px;
-      overflow-y: auto;
-    }
-
-    .user-item {
-      display: flex;
-      align-items: center;
-      gap: 16px;
-      padding: 16px;
-      border-radius: 24px;
-      cursor: pointer;
-      transition: all 0.3s ease;
-      margin-bottom: 8px;
-      background: rgba(255, 255, 255, 0.5);
-    }
-
-    .user-item:hover {
-      background: rgba(255, 230, 240, 0.9);
-      transform: translateX(8px);
-      box-shadow: 0 4px 12px rgba(255, 120, 160, 0.2);
-    }
-
-    .user-item-avatar {
-      width: 48px;
-      height: 48px;
-      border-radius: 24px;
-      object-fit: cover;
-      border: 2px solid white;
-    }
-
-    .user-item-info {
-      flex: 1;
-    }
-
-    .user-item-name {
-      font-family: 'Montserrat Alternates', sans-serif;
-      font-weight: 600;
-      font-size: 16px;
-      color: #4a2b3a;
-      margin-bottom: 4px;
-    }
-
-    .user-item-email {
-      font-family: 'Quicksand', sans-serif;
-      font-size: 12px;
-      color: #b35f7a;
-    }
-
-    /* Шапка чата */
-    .chat-header {
-      padding: 20px 24px;
-      background: rgba(255, 240, 245, 0.7);
-      display: flex;
-      align-items: center;
-      gap: 16px;
-      border-bottom: 1px solid rgba(255, 200, 220, 0.5);
-    }
-
-    .chat-header-avatar {
-      width: 48px;
-      height: 48px;
-      border-radius: 24px;
-      object-fit: cover;
-      border: 2px solid white;
-    }
-
-    .chat-header-info {
-      flex: 1;
-    }
-
-    .chat-header-name {
-      font-family: 'Comfortaa', cursive;
-      font-weight: 700;
-      font-size: 18px;
-      color: #ff3388;
-    }
-
-    .chat-header-status {
-      font-family: 'Quicksand', sans-serif;
-      font-size: 12px;
-      color: #b35f7a;
-    }
-
-    .back-btn {
-      background: none;
-      border: none;
-      font-size: 28px;
-      cursor: pointer;
-      color: #ff6b9d;
-      transition: transform 0.3s;
-      width: 40px;
-      height: 40px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .back-btn:hover {
-      transform: translateX(-5px);
-    }
-
-    /* Сообщения */
-    .messages-area {
-      padding: 24px;
-      min-height: 350px;
-      max-height: 450px;
-      overflow-y: auto;
-      background: rgba(255, 250, 252, 0.7);
-    }
-
-    .message {
-      margin-bottom: 16px;
-      max-width: 80%;
-      animation: messageAppear 0.4s ease;
-    }
-
-    @keyframes messageAppear {
-      from { opacity: 0; transform: translateY(10px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-
-    .message.you {
-      margin-left: auto;
-    }
-
-    .message-bubble {
-      padding: 14px 18px;
-      border-radius: 28px;
-      font-family: 'Quicksand', sans-serif;
-      font-size: 15px;
-      line-height: 1.5;
-      word-break: break-word;
-      box-shadow: 0 4px 12px rgba(255, 120, 160, 0.15);
-      position: relative;
-    }
-
-    .you .message-bubble {
-      background: linear-gradient(135deg, #ff8eb5, #ff6b9d);
-      color: white;
-      border-bottom-right-radius: 8px;
-    }
-
-    .them .message-bubble {
-      background: white;
-      color: #4a2b3a;
-      border-bottom-left-radius: 8px;
-      border: 1px solid rgba(255, 200, 220, 0.5);
-    }
-
-    .message-time {
-      font-size: 10px;
-      margin-top: 4px;
-      text-align: right;
-      font-family: 'Quicksand', sans-serif;
-      opacity: 0.7;
-    }
-
-    .you .message-time {
-      color: rgba(255, 255, 255, 0.8);
-    }
-
-    .them .message-time {
-      color: #b35f7a;
-    }
-
-    /* Поле ввода */
-    .input-area {
-      padding: 20px 24px;
-      background: rgba(255, 240, 245, 0.5);
-      display: flex;
-      gap: 12px;
-      align-items: flex-end;
-      border-top: 1px solid rgba(255, 200, 220, 0.5);
-    }
-
-    .message-input {
-      flex: 1;
-      border: 2px solid rgba(255, 200, 220, 0.7);
-      border-radius: 28px;
-      padding: 14px 20px;
-      font-family: 'Quicksand', sans-serif;
-      font-size: 15px;
-      resize: none;
-      min-height: 52px;
-      max-height: 120px;
-      background: white;
-      transition: all 0.3s;
-      outline: none;
-      color: #4a2b3a;
-    }
-
-    .message-input:focus {
-      border-color: #ff6b9d;
-      box-shadow: 0 0 0 4px rgba(255, 107, 157, 0.2);
-    }
-
-    .message-input::placeholder {
-      color: #d9a7b8;
-      font-style: italic;
-    }
-
-    .send-btn {
-      background: linear-gradient(135deg, #ff8eb5, #ff6b9d);
-      border: none;
-      width: 52px;
-      height: 52px;
-      border-radius: 28px;
-      color: white;
-      font-size: 24px;
-      cursor: pointer;
-      box-shadow: 0 4px 12px rgba(255, 107, 157, 0.3);
-      transition: all 0.3s;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .send-btn:hover {
-      transform: scale(1.1) rotate(10deg);
-      background: linear-gradient(135deg, #ff9ec2, #ff7aa8);
-    }
-
-    /* Скрытые элементы */
-    .hidden {
-      display: none;
-    }
-
-    /* Скролл */
-    ::-webkit-scrollbar {
-      width: 6px;
-    }
-
-    ::-webkit-scrollbar-track {
-      background: rgba(255, 200, 220, 0.3);
-    }
-
-    ::-webkit-scrollbar-thumb {
-      background: #ff8eb5;
-      border-radius: 10px;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Supabase Status Monitor</title>
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; background: #f0f2f5; display: flex; flex-direction: column; align-items: center; padding: 20px; }
+        .card { background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); width: 100%; max-width: 500px; margin-bottom: 20px; }
+        .user-item { display: flex; align-items: center; gap: 15px; padding: 10px; border-bottom: 1px solid #eee; transition: 0.3s; }
+        .status-dot { width: 12px; height: 12px; border-radius: 50%; }
+        .controls { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        button { padding: 10px; border: none; border-radius: 6px; cursor: pointer; font-weight: 600; color: white; transition: 0.2s; }
+        button:hover { opacity: 0.8; transform: translateY(-2px); }
+        .btn-study { background: #28a745; }
+        .btn-coffee { background: #ffc107; color: black; }
+        .btn-home { background: #6c757d; }
+        .btn-game { background: #17a2b8; }
+    </style>
 </head>
 <body>
-  <div class="chat-wrapper">
-    <!-- Экран входа (показывается сначала) -->
-    <div id="auth-screen" class="pink-container">
-      <div class="pink-title">pink chat</div>
-      <div class="pink-subtitle">нежные сообщения</div>
-      <button id="login-btn" class="pink-btn">🌸 Войти через Google</button>
-      
-      <div id="user-panel" class="hidden" style="margin-top: 30px;">
-        <img id="user-avatar" class="user-avatar" src="" alt="">
-        <div class="user-info">
-          <div id="user-name" class="user-name"></div>
-          <div id="user-email" class="user-email"></div>
+
+    <div class="card">
+        <h3>Мой профиль</h3>
+        <p id="myInfo">Загрузка...</p>
+        <div class="controls">
+            <button class="btn-study" onclick="changeStatus('📚 Учусь', '#28a745')">📚 Учусь</button>
+            <button class="btn-coffee" onclick="changeStatus('☕ Кофе-брейк', '#ffc107')">☕ Кофе</button>
+            <button class="btn-game" onclick="changeStatus('🎮 В игре', '#17a2b8')">🎮 В игре</button>
+            <button class="btn-home" onclick="changeStatus('🏠 Дома', '#6c757d')">🏠 Дома</button>
         </div>
-        <button id="logout-btn" class="pink-btn logout-btn">Выйти</button>
-      </div>
     </div>
 
-    <!-- Список пользователей (появляется после входа) -->
-    <div id="users-screen" class="pink-container hidden">
-      <div class="users-header">
-        <h2>Выберите собеседника</h2>
-      </div>
-      <div id="users-container" class="users-list">
-        <!-- Сюда будут добавляться пользователи -->
-      </div>
+    <div class="card">
+        <h3>Монитор группы</h3>
+        <div id="groupList">Поиск студентов...</div>
     </div>
 
-    <!-- Чат (появляется при выборе собеседника) -->
-    <div id="chat-screen" class="pink-container hidden">
-      <div class="chat-header">
-        <button id="back-from-chat" class="back-btn">←</button>
-        <img id="chat-avatar" class="chat-header-avatar" src="" alt="">
-        <div class="chat-header-info">
-          <div id="chat-name" class="chat-header-name"></div>
-          <div id="chat-status" class="chat-header-status">online</div>
-        </div>
-      </div>
+    <script type="module">
+        import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm'
 
-      <div id="messages-container" class="messages-area">
-        <!-- Сообщения -->
-      </div>
+        const URL = 'https://aclksvnlhxryvmkhwlax.supabase.co';
+        const KEY = 'sb_publishable_5PcgEIZhvrleB5p0HKUomQ_L_arGn1H';
+        const supabase = createClient(URL, KEY);
 
-      <div class="input-area">
-        <textarea id="message-input" class="message-input" placeholder="Напишите сообщение..." rows="1"></textarea>
-        <button id="send-message" class="send-btn">✿</button>
-      </div>
-    </div>
-  </div>
+        const MY_ID = 'c2a0f954-3d60-407d-b1be-f6c01f8bafeb'; 
 
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-    import {
-      getFirestore, collection, doc, setDoc, addDoc, onSnapshot,
-      query, orderBy, serverTimestamp
-    } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
-    import {
-      getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged
-    } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+        window.changeStatus = async (text, color) => {
+            const { error } = await supabase
+                .from('profiles')
+                .update({ status: text, color: color })
+                .eq('id', MY_ID);
 
-    const firebaseConfig = {
-      apiKey: "AIzaSyDZOKzs007RdB0tIMq1sYGWzKJGjiPsxgo",
-      authDomain: "marketingagency-c5d62.firebaseapp.com",
-      projectId: "marketingagency-c5d62",
-      storageBucket: "marketingagency-c5d62.firebasestorage.app",
-      messagingSenderId: "1090414010954",
-      appId: "1:1090414010954:web:2f30eb82901368b3d2fcb3"
-    };
+            if (error) {
+                alert("Ошибка! Проверьте RLS политики в Supabase.");
+                console.error(error);
+            } else {
+                fetchGroup();
+            }
+        };
 
-    const app = initializeApp(firebaseConfig);
-    const db = getFirestore(app);
-    const auth = getAuth(app);
-    const provider = new GoogleAuthProvider();
+        async function fetchGroup() {
+            const { data, error } = await supabase
+                .from('profiles')
+                .select('*')
+                .order('username', { ascending: true });
 
-    // Элементы DOM
-    const authScreen = document.getElementById('auth-screen');
-    const usersScreen = document.getElementById('users-screen');
-    const chatScreen = document.getElementById('chat-screen');
-    
-    const loginBtn = document.getElementById('login-btn');
-    const logoutBtn = document.getElementById('logout-btn');
-    const userPanel = document.getElementById('user-panel');
-    const userAvatar = document.getElementById('user-avatar');
-    const userNameEl = document.getElementById('user-name');
-    const userEmailEl = document.getElementById('user-email');
-    
-    const usersContainer = document.getElementById('users-container');
-    const messagesContainer = document.getElementById('messages-container');
-    const messageInput = document.getElementById('message-input');
-    const sendBtn = document.getElementById('send-message');
-    const backBtn = document.getElementById('back-from-chat');
-    const chatAvatar = document.getElementById('chat-avatar');
-    const chatName = document.getElementById('chat-name');
+            if (error) return console.error(error);
 
-    let currentChatUser = null;
-    let currentChatId = null;
-    let unsubscribeMessages = null;
+            const list = document.getElementById('groupList');
+            list.innerHTML = data.map(user => `
+                <div class="user-item">
+                    <div class="status-dot" style="background: ${user.color || '#ccc'}"></div>
+                    <div style="flex-grow: 1;">
+                        <strong>${user.username}</strong><br>
+                        <small style="color: #666;">${user.status || 'Статус не задан'}</small>
+                    </div>
+                </div>
+            `).join('');
 
-    // Сначала показываем только экран входа
-    authScreen.classList.remove('hidden');
-    usersScreen.classList.add('hidden');
-    chatScreen.classList.add('hidden');
+            const me = data.find(u => u.id === MY_ID);
+            if (me) document.getElementById('myInfo').innerText = Вы зашли как: ${me.username};
+        }
 
-    // Авторизация
-    loginBtn.addEventListener('click', () => {
-      signInWithPopup(auth, provider).catch(error => {
-        console.error('Ошибка входа:', error);
-        alert('Ошибка входа: ' + error.message);
-      });
-    });
+        fetchGroup();
 
-    logoutBtn.addEventListener('click', () => {
-      signOut(auth);
-    });
-
-    // Отслеживаем состояние авторизации
-    onAuthStateChanged(auth, async (user) => {
-      if (user) {
-        // Прячем экран входа, показываем список пользователей
-        authScreen.classList.add('hidden');
-        usersScreen.classList.remove('hidden');
-        chatScreen.classList.add('hidden');
-        
-        // Показываем панель пользователя
-        userPanel.classList.remove('hidden');
-        userAvatar.src = user.photoURL || 'https://via.placeholder.com/60/ff8eb5/ffffff?text=🌸';
-        userNameEl.textContent = user.displayName || 'Пользователь';
-        userEmailEl.textContent = user.email;
-
-        // Сохраняем пользователя в Firestore
-        await setDoc(doc(db, 'users', user.uid), {
-          uid: user.uid,
-          name: user.displayName || 'Без имени',
-          email: user.email,
-          photo: user.photoURL,
-          lastActive: serverTimestamp()
-        }, { merge: true });
-
-        // Загружаем список пользователей
-        loadUsers();
-      } else {
-        // Показываем экран входа
-        authScreen.classList.remove('hidden');
-        usersScreen.classList.add('hidden');
-        chatScreen.classList.add('hidden');
-        userPanel.classList.add('hidden');
-        
-        // Закрываем чат если был открыт
-        closeChat();
-      }
-    });
-
-    // Загрузка списка пользователей
-    function loadUsers() {
-      onSnapshot(collection(db, 'users'), (snap) => {
-        usersContainer.innerHTML = '';
-        snap.forEach(docSnap => {
-          const user = docSnap.data();
-          if (user.uid === auth.currentUser?.uid) return;
-
-          const userItem = document.createElement('div');
-          userItem.className = 'user-item';
-          userItem.innerHTML = `
-            <img src="${user.photo || 'https://via.placeholder.com/48/ff8eb5/ffffff?text=🌸'}" class="user-item-avatar" alt="">
-            <div class="user-item-info">
-              <div class="user-item-name">${user.name || 'Пользователь'}</div>
-              <div class="user-item-email">${user.email || ''}</div>
-            </div>
-          `;
-          userItem.addEventListener('click', () => openChat(user));
-          usersContainer.appendChild(userItem);
-        });
-      });
-    }
-
-    // Открыть чат
-    async function openChat(user) {
-      currentChatUser = user;
-      const uids = [auth.currentUser.uid, user.uid].sort();
-      currentChatId = uids.join('_');
-
-      // Создаем или обновляем документ чата
-      await setDoc(doc(db, 'chats', currentChatId), {
-        participants: uids,
-        lastMessageTime: serverTimestamp(),
-        updatedAt: serverTimestamp()
-      }, { merge: true });
-
-      // Обновляем шапку чата
-      chatAvatar.src = user.photo || 'https://via.placeholder.com/48/ff8eb5/ffffff?text=🌸';
-      chatName.textContent = user.name || 'Пользователь';
-
-      // Переключаем экраны
-      usersScreen.classList.add('hidden');
-      chatScreen.classList.remove('hidden');
-
-      // Загружаем сообщения
-      loadMessages();
-    }
-
-    // Закрыть чат
-    function closeChat() {
-      if (unsubscribeMessages) {
-        unsubscribeMessages();
-        unsubscribeMessages = null;
-      }
-      currentChatId = null;
-      currentChatUser = null;
-      messagesContainer.innerHTML = '';
-      
-      if (auth.currentUser) {
-        usersScreen.classList.remove('hidden');
-        chatScreen.classList.add('hidden');
-      }
-    }
-
-    // Загрузка сообщений
-    function loadMessages() {
-      if (!currentChatId) return;
-      if (unsubscribeMessages) unsubscribeMessages();
-
-      const messagesRef = collection(db, 'chats', currentChatId, 'messages');
-      const q = query(messagesRef, orderBy('timestamp', 'asc'));
-
-      unsubscribeMessages = onSnapshot(q, (snap) => {
-        messagesContainer.innerHTML = '';
-        snap.forEach(docSnap => {
-          const msg = docSnap.data();
-          const isYou = msg.fromUid === auth.currentUser?.uid;
-
-          const messageDiv = document.createElement('div');
-          messageDiv.className = `message ${isYou ? 'you' : 'them'}`;
-          
-          const time = msg.timestamp ? 
-            new Date(msg.timestamp.toDate()).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : 
-            '...';
-
-          messageDiv.innerHTML = `
-            <div class="message-bubble">${msg.text}</div>
-            <div class="message-time">${time}</div>
-          `;
-          messagesContainer.appendChild(messageDiv);
-        });
-        messagesContainer.scrollTop = messagesContainer.scrollHeight;
-      });
-    }
-
-    // Отправка сообщения
-    async function sendMessage() {
-      const text = messageInput.value.trim();
-      if (!text || !currentChatId) return;
-
-      const messagesRef = collection(db, 'chats', currentChatId, 'messages');
-      
-      await addDoc(messagesRef, {
-        fromUid: auth.currentUser.uid,
-        text: text,
-        timestamp: serverTimestamp()
-      });
-
-      await setDoc(doc(db, 'chats', currentChatId), {
-        lastMessage: text.substring(0, 50),
-        lastMessageTime: serverTimestamp(),
-        lastFrom: auth.currentUser.uid
-      }, { merge: true });
-
-      messageInput.value = '';
-      messageInput.style.height = 'auto';
-    }
-
-    // Обработчики
-    sendBtn.addEventListener('click', sendMessage);
-    
-    messageInput.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter' && !e.shiftKey) {
-        e.preventDefault();
-        sendMessage();
-      }
-    });
-
-    messageInput.addEventListener('input', function() {
-      this.style.height = 'auto';
-      this.style.height = (this.scrollHeight) + 'px';
-    });
-
-    backBtn.addEventListener('click', closeChat);
-  </script>
+        setInterval(fetchGroup, 5000);
+    </script>
 </body>
 </html>
