@@ -79,7 +79,7 @@
             `).join('');
 
             const me = data.find(u => u.id === MY_ID);
-            if (me) document.getElementById('myInfo').innerText = Вы зашли как: ${me.username};
+            if (me) document.getElementById('myInfo').innerText = `Вы зашли как: ${me.username}`;
         }
 
         fetchGroup();
