@@ -7,7 +7,6 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <style>
-
 body{
     font-family: Arial, sans-serif;
     background:#f4f6f8;
@@ -53,15 +52,14 @@ button{
 .user{
     margin-top:20px;
     font-weight:bold;
+    word-break: break-word;
 }
-
 </style>
 
 </head>
 <body>
 
 <div class="container">
-
 <h1>Авторизация</h1>
 
 <button class="google" id="googleLogin">
@@ -73,13 +71,12 @@ button{
 </button>
 
 <div class="user" id="user"></div>
-
 </div>
 
 <script>
-
+// ВАЖНО: Замените на ваши реальные ключи из панели Supabase
 const SUPABASE_URL = "https://aclksvnlhxryvmkhwlax.supabase.co"
-const SUPABASE_ANON_KEY = "sb_publishable_5PcgEIZhvrleB5p0HKUomQ_L_arGn1H"
+const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFjbGtzdm5saHhyeXZta2h3bGF4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3MDAwMDAwMDAsImV4cCI6MjAwMDAwMDAwMH0.example" // Замените на реальный ключ!
 
 const supabaseClient = supabase.createClient(
     SUPABASE_URL,
@@ -90,48 +87,124 @@ const googleBtn = document.getElementById("googleLogin")
 const logoutBtn = document.getElementById("logout")
 const userDiv = document.getElementById("user")
 
+// Функция для обновления UI
+function updateUI(user) {
+    if (user) {
+        userDiv.innerHTML = `
+            Вы вошли как:<br>
+            ${user.email}<br>
+            <small style="font-size:12px;color:#666;">
+                ID: ${user.id.substring(0,8)}...
+            </small>
+        `
+        googleBtn.style.display = "block"
+        logoutBtn.style.display = "block"
+    } else {
+        userDiv.innerHTML = "Вы не авторизованы"
+        googleBtn.style.display = "block"
+        logoutBtn.style.display = "block"
+    }
+}
+
+// Проверка пользователя
+async function checkUser() {
+    try {
+        // Получаем текущую сессию
+        const { data: { session }, error: sessionError } = await supabaseClient.auth.getSession()
+        
+        if (sessionError) {
+            console.error("Session error:", sessionError)
+            updateUI(null)
+            return
+        }
+
+        if (session?.user) {
+            updateUI(session.user)
+        } else {
+            updateUI(null)
+        }
+    } catch (error) {
+        console.error("Check user error:", error)
+        updateUI(null)
+    }
+}
+
+// Обработка редиректа после OAuth
+async function handleAuthRedirect() {
+    try {
+        const { data, error } = await supabaseClient.auth.getSession()
+        
+        if (error) {
+            console.error("Auth redirect error:", error)
+            return
+        }
+
+        // Проверяем параметры URL (на случай, если есть токены в URL)
+        const hashParams = new URLSearchParams(window.location.hash.substring(1))
+        if (hashParams.get('access_token')) {
+            // Есть токен в URL - редирект после OAuth
+            window.location.hash = '' // Очищаем hash
+            await checkUser()
+        }
+    } catch (error) {
+        console.error("Handle redirect error:", error)
+    }
+}
 
 // Вход через Google
 googleBtn.addEventListener("click", async () => {
+    try {
+        const { data, error } = await supabaseClient.auth.signInWithOAuth({
+            provider: "google",
+            options: {
+                redirectTo: window.location.origin + window.location.pathname
+            }
+        })
 
-    const { data, error } = await supabaseClient.auth.signInWithOAuth({
-        provider: "google"
-    })
-
-    if(error){
-        alert(error.message)
+        if (error) {
+            alert("Ошибка входа: " + error.message)
+            console.error("Login error:", error)
+        }
+        
+        // signInWithOAuth автоматически перенаправит на страницу Google
+    } catch (error) {
+        alert("Ошибка при входе: " + error.message)
+        console.error("Login error:", error)
     }
-
 })
-
-
-// Проверка пользователя
-async function checkUser(){
-
-    const { data: { user } } = await supabaseClient.auth.getUser()
-
-    if(user){
-
-        userDiv.innerHTML = `
-        Вы вошли как:<br>
-        ${user.email}
-        `
-
-    }
-
-}
-
-checkUser()
-
 
 // Выход
 logoutBtn.addEventListener("click", async () => {
-
-    await supabaseClient.auth.signOut()
-    location.reload()
-
+    try {
+        await supabaseClient.auth.signOut()
+        updateUI(null)
+        // Не перезагружаем страницу, просто обновляем UI
+    } catch (error) {
+        alert("Ошибка при выходе: " + error.message)
+        console.error("Logout error:", error)
+    }
 })
 
+// Слушаем изменения аутентификации
+supabaseClient.auth.onAuthStateChange((event, session) => {
+    console.log("Auth event:", event)
+    if (event === 'SIGNED_IN' && session?.user) {
+        updateUI(session.user)
+    } else if (event === 'SIGNED_OUT') {
+        updateUI(null)
+    }
+})
+
+// Инициализация
+async function init() {
+    await handleAuthRedirect()
+    await checkUser()
+}
+
+init()
+
+// Для отладки - выводим в консоль информацию
+console.log("Supabase client initialized")
 </script>
 
 </body>
