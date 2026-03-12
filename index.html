@@ -176,9 +176,17 @@ googleBtn.addEventListener("click", async () => {
 // Выход
 logoutBtn.addEventListener("click", async () => {
     try {
-        await supabaseClient.auth.signOut()
-        updateUI(null)
-        // Не перезагружаем страницу, просто обновляем UI
+        const { error } = await supabaseClient.auth.signOut()
+        if (error) {
+            alert("Ошибка при выходе: " + error.message)
+            console.error("Logout error:", error)
+        } else {
+            updateUI(null)
+            // Очищаем URL от возможных остаточных параметров аутентификации
+            window.location.hash = ''
+            // Перезагружаем страницу для полной очистки состояния
+            window.location.reload()
+        }
     } catch (error) {
         alert("Ошибка при выходе: " + error.message)
         console.error("Logout error:", error)
