@@ -74,9 +74,8 @@ button{
 </div>
 
 <script>
-// ВАЖНО: Замените на ваши реальные ключи из панели Supabase
-const SUPABASE_URL = "https://aclksvnlhxryvmkhwlax.supabase.coo"
-const SUPABASE_ANON_KEY = "sb_publishable_5PcgEIZhvrleB5p0HKUomQ_L_arGn1H" // Замените на реальный ключ!
+const SUPABASE_URL = "https://aclksvnlhxryvmkhwlax.supabase.co"
+const SUPABASE_ANON_KEY = "sb_publishable_5PcgEIZhvrleB5p0HKUomQ_L_arGn1H"
 
 const supabaseClient = supabase.createClient(
     SUPABASE_URL,
@@ -87,7 +86,6 @@ const googleBtn = document.getElementById("googleLogin")
 const logoutBtn = document.getElementById("logout")
 const userDiv = document.getElementById("user")
 
-// Функция для обновления UI
 function updateUI(user) {
     if (user) {
         userDiv.innerHTML = `
@@ -106,10 +104,8 @@ function updateUI(user) {
     }
 }
 
-// Проверка пользователя
 async function checkUser() {
     try {
-        // Получаем текущую сессию
         const { data: { session }, error: sessionError } = await supabaseClient.auth.getSession()
         
         if (sessionError) {
@@ -129,7 +125,6 @@ async function checkUser() {
     }
 }
 
-// Обработка редиректа после OAuth
 async function handleAuthRedirect() {
     try {
         const { data, error } = await supabaseClient.auth.getSession()
@@ -139,11 +134,9 @@ async function handleAuthRedirect() {
             return
         }
 
-        // Проверяем параметры URL (на случай, если есть токены в URL)
         const hashParams = new URLSearchParams(window.location.hash.substring(1))
         if (hashParams.get('access_token')) {
-            // Есть токен в URL - редирект после OAuth
-            window.location.hash = '' // Очищаем hash
+            window.location.hash = ''
             await checkUser()
         }
     } catch (error) {
@@ -151,7 +144,6 @@ async function handleAuthRedirect() {
     }
 }
 
-// Вход через Google
 googleBtn.addEventListener("click", async () => {
     try {
         const { data, error } = await supabaseClient.auth.signInWithOAuth({
@@ -165,15 +157,12 @@ googleBtn.addEventListener("click", async () => {
             alert("Ошибка входа: " + error.message)
             console.error("Login error:", error)
         }
-        
-        // signInWithOAuth автоматически перенаправит на страницу Google
     } catch (error) {
         alert("Ошибка при входе: " + error.message)
         console.error("Login error:", error)
     }
 })
 
-// Выход
 logoutBtn.addEventListener("click", async () => {
     try {
         const { error } = await supabaseClient.auth.signOut()
@@ -182,9 +171,7 @@ logoutBtn.addEventListener("click", async () => {
             console.error("Logout error:", error)
         } else {
             updateUI(null)
-            // Очищаем URL от возможных остаточных параметров аутентификации
             window.location.hash = ''
-            // Перезагружаем страницу для полной очистки состояния
             window.location.reload()
         }
     } catch (error) {
@@ -193,7 +180,6 @@ logoutBtn.addEventListener("click", async () => {
     }
 })
 
-// Слушаем изменения аутентификации
 supabaseClient.auth.onAuthStateChange((event, session) => {
     console.log("Auth event:", event)
     if (event === 'SIGNED_IN' && session?.user) {
@@ -203,7 +189,6 @@ supabaseClient.auth.onAuthStateChange((event, session) => {
     }
 })
 
-// Инициализация
 async function init() {
     await handleAuthRedirect()
     await checkUser()
@@ -211,7 +196,6 @@ async function init() {
 
 init()
 
-// Для отладки - выводим в консоль информацию
 console.log("Supabase client initialized")
 </script>
 
