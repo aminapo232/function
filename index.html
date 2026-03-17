@@ -413,15 +413,25 @@
             
             refresh();
 
-            // Realtime для profiles
-            supabaseClient.channel('profiles-changes')
-                .on('postgres_changes', { event: '*', schema: 'public', table: 'profiles' }, () => refreshUsers())
+            // Realtime для messages
+            supabaseClient.channel('messages-rt')
+                .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'messages' }, async () => {
+                    await refreshChat();
+                })
                 .subscribe();
 
-            // Realtime для messages — мгновенное появление
-            supabaseClient.channel('messages-changes')
-                .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'messages' }, () => refreshChat())
+            // Realtime для profiles
+            supabaseClient.channel('profiles-rt')
+                .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'profiles' }, async () => {
+                    await refreshUsers();
+                })
                 .subscribe();
+
+            // Polling как резервный механизм — каждые 3 секунды
+            setInterval(async () => {
+                await refreshChat();
+                await refreshUsers();
+            }, 3000);
 
             // Presence — индикатор онлайн
             const presenceChannel = supabaseClient.channel('online-room', { config: { presence: { key: user.id } } });
@@ -433,6 +443,15 @@
             });
         }
 
+        function formatTime(sec) {
+            const h = Math.floor(sec / 3600);
+            const m = Math.floor((sec % 3600) / 60);
+            const s = sec % 60;
+            if (h > 0) return `${h}ч ${m}м ${s}с`;
+            if (m > 0) return `${m}м ${s}с`;
+            return `${s} сек.`;
+        }
+
         function toggleStudy() {
             const btn = document.getElementById('study-btn');
             const display = document.getElementById('timer-display');
@@ -440,7 +459,7 @@
                 secondsSpent = 0;
                 studyInterval = setInterval(() => {
                     secondsSpent++;
-                    display.innerText = `⏱ ${secondsSpent} сек.`;
+                    display.innerText = `⏱ ${formatTime(secondsSpent)}`;
                 }, 1000);
                 btn.innerText = "⛔ Завершить сессию";
                 btn.className = "btn btn-stop";
@@ -452,7 +471,7 @@
                 btn.innerText = "📖 Начать учиться";
                 btn.className = "btn btn-study";
                 display.innerText = "⏱ 0 сек.";
-                updateStatus('☕ Закончил');
+                updateStatus('✅ Закончил');
             }
         }
 
@@ -466,6 +485,8 @@
         async function updateStatus(s) {
             const { data: { user } } = await supabaseClient.auth.getUser();
             await supabaseClient.from('profiles').update({ status: s }).eq('id', user.id);
+            // Сразу обновить UI без ожидания realtime
+            await refreshUsers();
         }
 
         async function sendMsg() {
@@ -474,6 +495,8 @@
             const { data: { user } } = await supabaseClient.auth.getUser();
             await supabaseClient.from('messages').insert([{ user_name: user.user_metadata.full_name, text: input.value }]);
             input.value = '';
+            // Сразу обновить чат
+            await refreshChat();
         }
 
         async function refreshUsers() {
@@ -487,6 +510,7 @@
                         : '<span style="color:#ccc;font-size:0.78em;">⚫ Офлайн</span>';
                     const ts = p.studyseconds || 0;
                     const h = Math.floor(ts/3600), m = Math.floor((ts%3600)/60), s = ts%60;
+                    const timeStr = h > 0 ? `${h}ч ${m}м ${s}с` : m > 0 ? `${m}м ${s}с` : `${s}с`;
                     return `
                         <div class="user-row">
                             <div class="name-wrap">
@@ -496,7 +520,7 @@
                             <div class="info">
                                 ${onlineLabel}<br>
                                 <span style="color:#b0607a;font-size:0.78em;">${p.status}</span><br>
-                                <span class="study-time">⏱ ${h}ч ${m}м ${s}с</span>
+                                <span class="study-time">⏱ ${timeStr}</span>
                             </div>
                         </div>
                     `;
