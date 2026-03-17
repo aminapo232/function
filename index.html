@@ -412,14 +412,24 @@
             }
             
             refresh();
-            supabaseClient.channel('db-sync').on('postgres_changes', { event: '*', schema: 'public' }, refresh).subscribe();
 
+            // Realtime для profiles
+            supabaseClient.channel('profiles-changes')
+                .on('postgres_changes', { event: '*', schema: 'public', table: 'profiles' }, () => refreshUsers())
+                .subscribe();
+
+            // Realtime для messages — мгновенное появление
+            supabaseClient.channel('messages-changes')
+                .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'messages' }, () => refreshChat())
+                .subscribe();
+
+            // Presence — индикатор онлайн
             const presenceChannel = supabaseClient.channel('online-room', { config: { presence: { key: user.id } } });
             presenceChannel.on('presence', { event: 'sync' }, () => {
                 onlineUsers = presenceChannel.presenceState();
-                refresh();
+                refreshUsers();
             }).subscribe(async (s) => {
-                if (s === 'SUBSCRIBED') await presenceChannel.track({ online_at: new Date().toISOString() });
+                if (s === 'SUBSCRIBED') await presenceChannel.track({ name: name, online_at: new Date().toISOString() });
             });
         }
 
@@ -466,12 +476,15 @@
             input.value = '';
         }
 
-        async function refresh() {
+        async function refreshUsers() {
             const { data: pr } = await supabaseClient.from('profiles').select('*').order('username');
             const list = document.getElementById('status-list');
             if (pr) {
                 list.innerHTML = pr.map(p => {
                     const isOnline = onlineUsers[p.id] ? 'status-online' : '';
+                    const onlineLabel = onlineUsers[p.id]
+                        ? '<span style="color:#ff6fa8;font-weight:700;font-size:0.78em;">🟢 Онлайн</span>'
+                        : '<span style="color:#ccc;font-size:0.78em;">⚫ Офлайн</span>';
                     const ts = p.studyseconds || 0;
                     const h = Math.floor(ts/3600), m = Math.floor((ts%3600)/60), s = ts%60;
                     return `
@@ -481,19 +494,28 @@
                                 <b>${p.username}</b>
                             </div>
                             <div class="info">
-                                ${p.status}<br>
+                                ${onlineLabel}<br>
+                                <span style="color:#b0607a;font-size:0.78em;">${p.status}</span><br>
                                 <span class="study-time">⏱ ${h}ч ${m}м ${s}с</span>
                             </div>
                         </div>
                     `;
                 }).join('');
             }
-            const { data: msgs } = await supabaseClient.from('messages').select('*').order('created_at', { ascending: false }).limit(15);
+        }
+
+        async function refreshChat() {
+            const { data: msgs } = await supabaseClient.from('messages').select('*').order('created_at', { ascending: false }).limit(30);
             const chatDiv = document.getElementById('chat');
             if (msgs) {
                 chatDiv.innerHTML = msgs.reverse().map(m => `<div><b>${m.user_name}:</b> ${m.text}</div>`).join('');
                 chatDiv.scrollTop = chatDiv.scrollHeight;
             }
+        }
+
+        async function refresh() {
+            await refreshUsers();
+            await refreshChat();
         }
 
         checkSession();
