@@ -452,14 +452,27 @@
             return `${s} сек.`;
         }
 
+        let baseStudySeconds = 0; // сколько было в БД до начала сессии
+
         function toggleStudy() {
             const btn = document.getElementById('study-btn');
             const display = document.getElementById('timer-display');
             if (!studyInterval) {
                 secondsSpent = 0;
-                studyInterval = setInterval(() => {
+                // Загрузить текущее значение из БД
+                supabaseClient.auth.getUser().then(({ data: { user } }) => {
+                    supabaseClient.from('profiles').select('studyseconds').eq('id', user.id).single().then(({ data }) => {
+                        baseStudySeconds = data ? (data.studyseconds || 0) : 0;
+                    });
+                });
+                studyInterval = setInterval(async () => {
                     secondsSpent++;
                     display.innerText = `⏱ ${formatTime(secondsSpent)}`;
+                    // Сохранять в БД каждые 5 секунд
+                    if (secondsSpent % 5 === 0) {
+                        const { data: { user } } = await supabaseClient.auth.getUser();
+                        await supabaseClient.from('profiles').update({ studyseconds: baseStudySeconds + secondsSpent }).eq('id', user.id);
+                    }
                 }, 1000);
                 btn.innerText = "⛔ Завершить сессию";
                 btn.className = "btn btn-stop";
