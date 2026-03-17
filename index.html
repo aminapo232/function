@@ -393,13 +393,13 @@
         async function login() { 
             await supabaseClient.auth.signInWithOAuth({ 
                 provider: 'google',
-                options: { redirectTo: 'https://duisenbekalmas.github.io/qazaq/' }
+                options: { redirectTo: 'https://aminapo232.github.io/function/' }
             }); 
         }
 
         async function logout() { 
             await supabaseClient.auth.signOut(); 
-            window.location.href = 'https://duisenbekalmas.github.io/qazaq/'; 
+            window.location.href = 'https://aminapo232.github.io/function/'; 
         }
 
         async function setup(user) {
