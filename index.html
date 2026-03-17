@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>РО232</title>
+    <title>TIS 251 - Group Hub</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
     <style>
@@ -448,9 +448,9 @@
 
         async function saveStudyTime(sec) {
             const { data: { user } } = await supabaseClient.auth.getUser();
-            const { data } = await supabaseClient.from('profiles').select('study_seconds').eq('id', user.id).single();
-            const total = (data ? (data.study_seconds || 0) : 0) + sec;
-            await supabaseClient.from('profiles').update({ study_seconds: total }).eq('id', user.id);
+            const { data } = await supabaseClient.from('profiles').select('studyseconds').eq('id', user.id).single();
+            const total = (data ? (data.studyseconds || 0) : 0) + sec;
+            await supabaseClient.from('profiles').update({ studyseconds: total }).eq('id', user.id);
         }
 
         async function updateStatus(s) {
@@ -472,7 +472,7 @@
             if (pr) {
                 list.innerHTML = pr.map(p => {
                     const isOnline = onlineUsers[p.id] ? 'status-online' : '';
-                    const ts = p.study_seconds || 0;
+                    const ts = p.studyseconds || 0;
                     const h = Math.floor(ts/3600), m = Math.floor((ts%3600)/60), s = ts%60;
                     return `
                         <div class="user-row">
