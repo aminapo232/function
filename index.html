@@ -1,203 +1,205 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-<meta charset="UTF-8">
-<title>Supabase Google Login</title>
-
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
-<style>
-body{
-    font-family: Arial, sans-serif;
-    background:#f4f6f8;
-    height:100vh;
-    display:flex;
-    justify-content:center;
-    align-items:center;
-}
-
-.container{
-    background:white;
-    padding:40px;
-    border-radius:12px;
-    width:320px;
-    text-align:center;
-    box-shadow:0 10px 25px rgba(0,0,0,0.1);
-}
-
-h1{
-    margin-bottom:25px;
-}
-
-button{
-    width:100%;
-    padding:12px;
-    border:none;
-    border-radius:6px;
-    margin-top:10px;
-    font-size:16px;
-    cursor:pointer;
-}
-
-.google{
-    background:#4285F4;
-    color:white;
-}
-
-.logout{
-    background:#e53935;
-    color:white;
-}
-
-.user{
-    margin-top:20px;
-    font-weight:bold;
-    word-break: break-word;
-}
-</style>
-
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TIS 251 - Group Hub</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        :root { --primary: #3ecf8e; --bg: #f0f2f5; --card: #ffffff; }
+        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); display: flex; flex-direction: column; align-items: center; padding: 20px; margin: 0; }
+        .card { background: var(--card); padding: 20px; border-radius: 16px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); width: 100%; max-width: 400px; margin-bottom: 20px; box-sizing: border-box; text-align: center; }
+        #app { display: none; width: 100%; max-width: 400px; }
+        .btn { padding: 12px; border: none; border-radius: 10px; cursor: pointer; color: white; font-weight: 600; width: 100%; transition: 0.3s; margin-top: 8px; }
+        .btn-study { background: #28a745; margin-bottom: 10px; }
+        .status-dot { height: 10px; width: 10px; background-color: #bbb; border-radius: 50%; display: inline-block; margin-right: 8px; }
+        .status-online { background-color: #28a745; box-shadow: 0 0 8px #28a745; }
+        #chat { height: 180px; overflow-y: auto; background: #f9f9f9; border-radius: 8px; padding: 10px; margin: 10px 0; border: 1px solid #eee; text-align: left; font-size: 0.9em; }
+        .timer { font-size: 1.8em; font-weight: bold; color: #1a73e8; margin: 10px 0; }
+        .user-row { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid #f1f1f1; text-align: left; }
+        input[type="text"] { width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #ddd; box-sizing: border-box; }
+    </style>
 </head>
 <body>
 
-<div class="container">
-<h1>Авторизация</h1>
+    <div id="login-ui" class="card">
+        <h2 style="color: #1a73e8;">TIS 251 Hub</h2>
+        <p>Авторизуйтесь через Google для входа в систему.</p>
+        <button onclick="login()" class="btn" style="background: #4285F4;">Войти через Google</button>
+    </div>
 
-<button class="google" id="googleLogin">
-Войти через Google
-</button>
+    <div id="app">
+        <div class="card">
+            <h3 id="user-display">Загрузка...</h3>
+            <div class="timer" id="timer-display">⏱️ 0 сек.</div>
+            <button id="study-btn" onclick="toggleStudy()" class="btn btn-study">📖 Начать учиться</button>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+                <button onclick="updateStatus('☕ Перерыв')" class="btn" style="background: #ffc107; color: #000;">☕ Перерыв</button>
+                <button onclick="logout()" class="btn" style="background: #6c757d;">Выход</button>
+            </div>
+        </div>
 
-<button class="logout" id="logout">
-Выйти
-</button>
+        <div class="card">
+            <h4>👥 Монитор группы</h4>
+            <div id="status-list"></div>
+        </div>
 
-<div class="user" id="user"></div>
-</div>
+        <div class="card">
+            <h4>💬 Общий чат</h4>
+            <div id="chat"></div>
+            <div style="display: flex; gap: 5px;">
+                <input type="text" id="msg-input" placeholder="Сообщение...">
+                <button onclick="sendMsg()" class="btn" style="background: var(--primary); width: 60px; margin: 0;">➤</button>
+            </div>
+        </div>
+    </div>
 
-<script>
-const SUPABASE_URL = "https://aclksvnlhxryvmkhwlax.supabase.co"
-const SUPABASE_ANON_KEY = "sb_publishable_5PcgEIZhvrleB5p0HKUomQ_L_arGn1H"
+    <script>
+        const SB_URL = 'https://rncerhgizyjhovbdpqnl.supabase.co'; 
+        const SB_KEY = 'sb_publishable_ThtftS6uBeaKf8FyndIFTg_O0HMJ5yh';
+        const supabaseClient = supabase.createClient(SB_URL, SB_KEY);
 
-const supabaseClient = supabase.createClient(
-    SUPABASE_URL,
-    SUPABASE_ANON_KEY
-)
+        let studyInterval = null;
+        let secondsSpent = 0;
+        let onlineUsers = {};
 
-const googleBtn = document.getElementById("googleLogin")
-const logoutBtn = document.getElementById("logout")
-const userDiv = document.getElementById("user")
-
-function updateUI(user) {
-    if (user) {
-        userDiv.innerHTML = `
-            Вы вошли как:<br>
-            ${user.email}<br>
-            <small style="font-size:12px;color:#666;">
-                ID: ${user.id.substring(0,8)}...
-            </small>
-        `
-        googleBtn.style.display = "block"
-        logoutBtn.style.display = "block"
-    } else {
-        userDiv.innerHTML = "Вы не авторизованы"
-        googleBtn.style.display = "block"
-        logoutBtn.style.display = "block"
-    }
-}
-
-async function checkUser() {
-    try {
-        const { data: { session }, error: sessionError } = await supabaseClient.auth.getSession()
-        
-        if (sessionError) {
-            console.error("Session error:", sessionError)
-            updateUI(null)
-            return
-        }
-
-        if (session?.user) {
-            updateUI(session.user)
-        } else {
-            updateUI(null)
-        }
-    } catch (error) {
-        console.error("Check user error:", error)
-        updateUI(null)
-    }
-}
-
-async function handleAuthRedirect() {
-    try {
-        const { data, error } = await supabaseClient.auth.getSession()
-        
-        if (error) {
-            console.error("Auth redirect error:", error)
-            return
-        }
-
-        const hashParams = new URLSearchParams(window.location.hash.substring(1))
-        if (hashParams.get('access_token')) {
-            window.location.hash = ''
-            await checkUser()
-        }
-    } catch (error) {
-        console.error("Handle redirect error:", error)
-    }
-}
-
-googleBtn.addEventListener("click", async () => {
-    try {
-        const { data, error } = await supabaseClient.auth.signInWithOAuth({
-            provider: "google",
-            options: {
-                redirectTo: window.location.origin + window.location.pathname
+        // 1. Принудительная проверка сессии при загрузке (решает проблему "зависания")
+        async function checkSession() {
+            const { data: { session } } = await supabaseClient.auth.getSession();
+            if (session) {
+                console.log("Сессия найдена!");
+                showApp(session.user);
             }
-        })
-
-        if (error) {
-            alert("Ошибка входа: " + error.message)
-            console.error("Login error:", error)
         }
-    } catch (error) {
-        alert("Ошибка при входе: " + error.message)
-        console.error("Login error:", error)
-    }
-})
 
-logoutBtn.addEventListener("click", async () => {
-    try {
-        const { error } = await supabaseClient.auth.signOut()
-        if (error) {
-            alert("Ошибка при выходе: " + error.message)
-            console.error("Logout error:", error)
-        } else {
-            updateUI(null)
-            window.location.hash = ''
-            window.location.reload()
+        // 2. Слушатель изменений авторизации
+        supabaseClient.auth.onAuthStateChange((event, session) => {
+            console.log("Событие Auth:", event);
+            if (session) {
+                showApp(session.user);
+                // Очистка URL от токена доступа
+                if (window.location.hash.includes('access_token')) {
+                    window.history.replaceState(null, null, window.location.origin + window.location.pathname);
+                }
+            } else {
+                document.getElementById('login-ui').style.display = 'block';
+                document.getElementById('app').style.display = 'none';
+            }
+        });
+
+        function showApp(user) {
+            document.getElementById('login-ui').style.display = 'none';
+            document.getElementById('app').style.display = 'block';
+            setup(user);
         }
-    } catch (error) {
-        alert("Ошибка при выходе: " + error.message)
-        console.error("Logout error:", error)
-    }
-})
 
-supabaseClient.auth.onAuthStateChange((event, session) => {
-    console.log("Auth event:", event)
-    if (event === 'SIGNED_IN' && session?.user) {
-        updateUI(session.user)
-    } else if (event === 'SIGNED_OUT') {
-        updateUI(null)
-    }
-})
+        async function login() { 
+            await supabaseClient.auth.signInWithOAuth({ 
+                provider: 'google',
+                options: { 
+                    redirectTo: 'https://duisenbekalmas.github.io/qazaq/' 
+                }
+            }); 
+        }
 
-async function init() {
-    await handleAuthRedirect()
-    await checkUser()
-}
+        async function logout() { 
+            await supabaseClient.auth.signOut(); 
+            window.location.href = 'https://duisenbekalmas.github.io/qazaq/'; 
+        }
 
-init()
+        async function setup(user) {
+            const name = user.user_metadata.full_name || user.email;
+            document.getElementById('user-display').innerText = name;
+            
+            const { data: profile } = await supabaseClient.from('profiles').select('*').eq('id', user.id).single();
+            if (!profile) {
+                await supabaseClient.from('profiles').insert([{ id: user.id, username: name, status: 'В сети' }]);
+            }
+            
+            refresh();
+            supabaseClient.channel('db-sync').on('postgres_changes', { event: '*', schema: 'public' }, refresh).subscribe();
 
-console.log("Supabase client initialized")
-</script>
+            const presenceChannel = supabaseClient.channel('online-room', { config: { presence: { key: user.id } } });
+            presenceChannel.on('presence', { event: 'sync' }, () => {
+                onlineUsers = presenceChannel.presenceState();
+                refresh();
+            }).subscribe(async (s) => {
+                if (s === 'SUBSCRIBED') await presenceChannel.track({ online_at: new Date().toISOString() });
+            });
+        }
 
+        // --- Логика таймера и чата ---
+        function toggleStudy() {
+            const btn = document.getElementById('study-btn');
+            const display = document.getElementById('timer-display');
+            if (!studyInterval) {
+                secondsSpent = 0;
+                studyInterval = setInterval(() => {
+                    secondsSpent++;
+                    display.innerText = `⏱️ ${secondsSpent} сек.`;
+                }, 1000);
+                btn.innerText = "⛔ Завершить сессию";
+                btn.style.background = "#dc3545";
+                updateStatus('📖 Учится');
+            } else {
+                clearInterval(studyInterval);
+                studyInterval = null;
+                saveStudyTime(secondsSpent);
+                btn.innerText = "📖 Начать учиться";
+                btn.style.background = "#28a745";
+                display.innerText = "⏱️ 0 сек.";
+                updateStatus('☕ Закончил');
+            }
+        }
+
+        async function saveStudyTime(sec) {
+            const { data: { user } } = await supabaseClient.auth.getUser();
+            const { data } = await supabaseClient.from('profiles').select('study_seconds').eq('id', user.id).single();
+            const total = (data ? (data.study_seconds || 0) : 0) + sec;
+            await supabaseClient.from('profiles').update({ study_seconds: total }).eq('id', user.id);
+        }
+
+        async function updateStatus(s) {
+            const { data: { user } } = await supabaseClient.auth.getUser();
+            await supabaseClient.from('profiles').update({ status: s }).eq('id', user.id);
+        }
+
+        async function sendMsg() {
+            const input = document.getElementById('msg-input');
+            if (!input.value.trim()) return;
+            const { data: { user } } = await supabaseClient.auth.getUser();
+            await supabaseClient.from('messages').insert([{ user_name: user.user_metadata.full_name, text: input.value }]);
+            input.value = '';
+        }
+
+        async function refresh() {
+            const { data: pr } = await supabaseClient.from('profiles').select('*').order('username');
+            const list = document.getElementById('status-list');
+            if (pr) {
+                list.innerHTML = pr.map(p => {
+                    const isOnline = onlineUsers[p.id] ? 'status-online' : '';
+                    const ts = p.study_seconds || 0;
+                    const h = Math.floor(ts/3600), m = Math.floor((ts%3600)/60), s = ts%60;
+                    return `
+                        <div class="user-row">
+                            <span><span class="status-dot ${isOnline}"></span><b>${p.username}</b></span>
+                            <span style="font-size: 0.8em; color: #666; text-align: right;">
+                                ${p.status} <br> <small style="color: #1a73e8;">⏱ ${h}ч ${m}м ${s}с</small>
+                            </span>
+                        </div>
+                    `;
+                }).join('');
+            }
+            const { data: msgs } = await supabaseClient.from('messages').select('*').order('created_at', { ascending: false }).limit(15);
+            const chatDiv = document.getElementById('chat');
+            if (msgs) {
+                chatDiv.innerHTML = msgs.reverse().map(m => `<div><b>${m.user_name}:</b> ${m.text}</div>`).join('');
+                chatDiv.scrollTop = chatDiv.scrollHeight;
+            }
+        }
+
+        // Запуск проверки при загрузке страницы
+        checkSession();
+    </script>
 </body>
 </html>
