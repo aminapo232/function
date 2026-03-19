@@ -599,7 +599,7 @@
         const { data: profile } = await supabaseClient.from('profiles').select('*').eq('id', currentUser.id).single();
         if (!profile) return;
 
-        const { data: allProfiles } = await supabaseClient.from('profiles').select('studyseconds').order('studyseconds', { ascending: false });
+        const { data: allProfiles } = await supabaseClient.from('profiles').select('studyseconds').order('studyseconds', { ascending: false, nullsFirst: false });
         const rank = allProfiles ? allProfiles.findIndex(p => p.studyseconds <= (profile.studyseconds || 0)) + 1 : 99;
         const correctedRank = allProfiles ? allProfiles.findIndex((_, i) =>
             allProfiles.slice(0, i+1).reduce((a,b) => Math.max(a, b.studyseconds||0), 0) >= (profile.studyseconds||0)
@@ -648,7 +648,7 @@
 
     // ===== LEADERBOARD =====
     async function refreshLeaderboard() {
-        const { data: profiles } = await supabaseClient.from('profiles').select('*').order('studyseconds', { ascending: false });
+        const { data: profiles } = await supabaseClient.from('profiles').select('*').order('studyseconds', { ascending: false, nullsFirst: false });
         const list = document.getElementById('leaderboard-list');
         if (!profiles || !list) return;
 
